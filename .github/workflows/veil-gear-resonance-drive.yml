@@ -56,7 +56,6 @@ function releaseDrive(targetMode){
           text=text.replace(old,new)
           text=text.replace("function shift(){\n if(!S.run)return;\n if(S.mode==='skirmish'){S.mode='gear';","function shift(){\n if(!S.run)return;\n let next=S.mode==='skirmish'?'gear':'skirmish';if(S.drive>0&&S.echoes>0)releaseDrive(next);\n if(S.mode==='skirmish'){S.mode='gear';")
           text=text.replace("if(d<graze&&!b.g){b.g=true;S.res=Math.min(100,S.res+4);S.chain++;part(b.x,b.y,'#7fd7ff',3);tone(720,.025,.006);","if(d<graze&&!b.g){b.g=true;S.chain++;if(S.drive>0){S.echoes=Math.min(S.driveMax,S.echoes+1);S.eshots.splice(S.eshots.indexOf(b),1);part(b.x,b.y,'#c9a2ff',5);fl('ECHO '+S.echoes,player.x,player.y-32,'#c9a2ff');tone(840,.035,.008,'triangle');if(has('burstFuel'))S.fuel=Math.min(S.mfuel,S.fuel+1)}else{S.res=Math.min(100,S.res+4);part(b.x,b.y,'#7fd7ff',3);tone(720,.025,.006);")
-          text=text.replace("if(has('graze')&&S.chain%8===0)S.hp=Math.min(S.mhp,S.hp+1);if(has('grazeTag')&&S.chain%3===0&&S.enemies.length){","if(has('graze')&&S.chain%8===0)S.hp=Math.min(S.mhp,S.hp+1);if(has('grazeTag')&&S.chain%3===0&&S.enemies.length){")
           text=text.replace("learn('graze','Grazing bullets builds Resonance without taking damage.')}\n }","learn('graze','Grazing bullets builds Resonance without taking damage.')}}\n }")
           text=text.replace("if(S.mode==='skirmish')S.fuel=Math.min(S.mfuel,S.fuel+10*dt);","if(S.mode==='skirmish')S.fuel=Math.min(S.mfuel,S.fuel+10*dt);if(S.drive>0){S.drive=Math.max(0,S.drive-dt);if(S.drive===0){if(S.echoes){let fuel=Math.min(24,S.echoes*2),heal=Math.floor(S.echoes/4);S.fuel=Math.min(S.mfuel,S.fuel+fuel);S.hp=Math.min(S.mhp,S.hp+heal);fl('+'+fuel+' FUEL',player.x,player.y-32,'#e7ba67');if(heal)fl('+'+heal+' HULL',player.x,player.y-46,'#9ee0bb');msg('DRIVE COLLAPSE // unused echoes folded into Fuel'+(heal?' and Hull.':'.'))}S.echoes=0}}")
           text=text.replace("document.getElementById('resT').textContent=Math.floor(S.res);","document.getElementById('resT').textContent=S.drive>0?('DRIVE '+S.echoes+'/'+S.driveMax):Math.floor(S.res);")
@@ -72,3 +71,4 @@ function releaseDrive(targetMode){
           git add games/veil-gear/index.html
           git commit -m 'Replace BURST with Resonance Drive' || exit 0
           git push
+# trigger
