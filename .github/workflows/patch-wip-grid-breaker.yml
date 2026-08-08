@@ -21,3 +21,4 @@ jobs:
           git add index.html
           git commit -m 'Point WIP cabinet to GRID BREAKER' || exit 0
           git push
+# trigger
