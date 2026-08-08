@@ -1,0 +1,74 @@
+name: VEIL GEAR resonance drive
+on:
+  push:
+    paths:
+      - '.github/workflows/veil-gear-resonance-drive.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch resonance drive
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('games/veil-gear/index.html')
+          text=p.read_text()
+          text=text.replace("const S={run:false,wave:1,mode:'skirmish',hp:100,mhp:100,fuel:100,mfuel:100,res:0,chain:0,score:0,shotT:0,spawnT:0,enemies:[],shots:[],eshots:[],parts:[],floats:[],mods:[],boss:false};","const S={run:false,wave:1,mode:'skirmish',hp:100,mhp:100,fuel:100,mfuel:100,res:0,chain:0,score:0,shotT:0,spawnT:0,enemies:[],shots:[],eshots:[],parts:[],floats:[],mods:[],boss:false,drive:0,echoes:0,driveMax:18};")
+          text=text.replace("<button class=\"ctrl\" id=\"burst\">BURST</button>","<button class=\"ctrl\" id=\"burst\">RESONANCE DRIVE</button>")
+          text=text.replace("Spend it on BURST to fracture defenses and erase nearby fire.","Spend 30 Resonance to enter DRIVE. Graze bullets into captured echoes, then SHIFT to cash them out.")
+          text=text.replace("['Broken Halo','BURST costs 15 Resonance instead of 20.','cheap']","['Broken Halo','RESONANCE DRIVE costs 24 instead of 30.','cheap']")
+          text=text.replace("['Choir Furnace','BURST converts erased bullets into Fuel.','burstFuel']","['Choir Furnace','Each captured echo grants +1 Fuel while DRIVE is active.','burstFuel']")
+          old="""function burst(){
+ if(!S.run||busy)return;let cost=has('cheap')?15:20;if(S.res<cost){msg('Need '+cost+' Resonance for BURST. Graze enemy fire.');tone(100,.08,.02);return}
+ S.res-=cost;navigator.vibrate?.([18,30,18]);tone(90,.18,.04,'sawtooth');part(player.x,player.y,'#c9a2ff',30);
+ let before=S.eshots.length;S.eshots=S.eshots.filter(b=>Math.hypot(b.x-player.x,b.y-player.y)>110);let erased=before-S.eshots.length;if(has('burstFuel')&&erased){let gain=Math.min(30,erased*2);S.fuel=Math.min(S.mfuel,S.fuel+gain);fl('+'+gain+' FUEL',player.x,player.y-30,'#e7ba67')}
+ let hit=0;S.enemies.forEach(e=>{if(Math.hypot(e.x-player.x,e.y-player.y)<180){e.fract=2.8;e.adapt=null;hit++;fl('FRACTURE',e.x,e.y-35,'#c9a2ff')}});
+ if(hit)learn('fracture','BURST fractures armor and clears adaptive resistance.');
+ msg('BURST // '+hit+' target'+(hit===1?'':'s')+' fractured. Nearby fire erased.');hud()
+}"""
+          new="""function burst(){
+ if(!S.run||busy)return;
+ if(S.drive>0){msg('DRIVE already active // keep grazing, then SHIFT to release the echoes.');tone(720,.05,.01);return}
+ let cost=has('cheap')?24:30;if(S.res<cost){msg('Need '+cost+' Resonance for DRIVE. Graze enemy fire.');tone(100,.08,.02);return}
+ S.res-=cost;S.drive=4.2;S.echoes=0;navigator.vibrate?.([18,26,18]);tone(95,.2,.045,'sawtooth');part(player.x,player.y,'#c9a2ff',28);msg('RESONANCE DRIVE // graze bullets into echoes. SHIFT before the timer dies.');learn('drive','During DRIVE, grazing captures enemy fire as echoes. SHIFT determines how the echoes are released.');hud()
+}
+function releaseDrive(targetMode){
+ if(S.drive<=0||S.echoes<=0){S.drive=0;S.echoes=0;return}
+ let n=S.echoes;
+ if(targetMode==='gear'){
+   let lanes=Math.min(9,3+Math.floor(n/2));for(let i=0;i<lanes;i++){let spread=(i-(lanes-1)/2)*22;S.shots.push({x:player.x,y:player.y-16,vx:spread,vy:-500,r:5,d:10+Math.floor(n*.8),type:'g',pierce:true,echo:true})}
+   fl('ECHO LANCE x'+lanes,player.x,player.y-35,'#ffcf8c');msg('DRIVE RELEASE // captured fire becomes a piercing GEAR volley.');tone(120,.2,.04,'sawtooth')
+ }else{
+   let targets=[...S.enemies].sort((a,b)=>Math.hypot(a.x-player.x,a.y-player.y)-Math.hypot(b.x-player.x,b.y-player.y));let pool=Math.max(1,n);targets.forEach((e,i)=>{let add=Math.max(1,Math.ceil((pool/(i+1))*.55));e.tag=Math.min(8,e.tag+add);fl('+TAG '+add,e.x,e.y-30,'#7fd7ff')});
+   for(let i=0;i<Math.min(18,n);i++){let a=Math.PI*2*i/Math.min(18,n);S.shots.push({x:player.x,y:player.y,vx:Math.cos(a)*180,vy:Math.sin(a)*180,r:3,d:4,type:'s',echo:true})}
+   msg('DRIVE RELEASE // captured fire blooms outward as TAG pressure.');tone(620,.14,.03,'triangle')
+ }
+ navigator.vibrate?.([12,18,28]);part(player.x,player.y,targetMode==='gear'?'#ffb06a':'#7fd7ff',26);S.drive=0;S.echoes=0
+}"""
+          if old not in text:
+              raise SystemExit('burst block not found')
+          text=text.replace(old,new)
+          text=text.replace("function shift(){\n if(!S.run)return;\n if(S.mode==='skirmish'){S.mode='gear';","function shift(){\n if(!S.run)return;\n let next=S.mode==='skirmish'?'gear':'skirmish';if(S.drive>0&&S.echoes>0)releaseDrive(next);\n if(S.mode==='skirmish'){S.mode='gear';")
+          text=text.replace("if(d<graze&&!b.g){b.g=true;S.res=Math.min(100,S.res+4);S.chain++;part(b.x,b.y,'#7fd7ff',3);tone(720,.025,.006);","if(d<graze&&!b.g){b.g=true;S.chain++;if(S.drive>0){S.echoes=Math.min(S.driveMax,S.echoes+1);S.eshots.splice(S.eshots.indexOf(b),1);part(b.x,b.y,'#c9a2ff',5);fl('ECHO '+S.echoes,player.x,player.y-32,'#c9a2ff');tone(840,.035,.008,'triangle');if(has('burstFuel'))S.fuel=Math.min(S.mfuel,S.fuel+1)}else{S.res=Math.min(100,S.res+4);part(b.x,b.y,'#7fd7ff',3);tone(720,.025,.006);")
+          text=text.replace("if(has('graze')&&S.chain%8===0)S.hp=Math.min(S.mhp,S.hp+1);if(has('grazeTag')&&S.chain%3===0&&S.enemies.length){","if(has('graze')&&S.chain%8===0)S.hp=Math.min(S.mhp,S.hp+1);if(has('grazeTag')&&S.chain%3===0&&S.enemies.length){")
+          text=text.replace("learn('graze','Grazing bullets builds Resonance without taking damage.')}\n }","learn('graze','Grazing bullets builds Resonance without taking damage.')}}\n }")
+          text=text.replace("if(S.mode==='skirmish')S.fuel=Math.min(S.mfuel,S.fuel+10*dt);","if(S.mode==='skirmish')S.fuel=Math.min(S.mfuel,S.fuel+10*dt);if(S.drive>0){S.drive=Math.max(0,S.drive-dt);if(S.drive===0){if(S.echoes){let fuel=Math.min(24,S.echoes*2),heal=Math.floor(S.echoes/4);S.fuel=Math.min(S.mfuel,S.fuel+fuel);S.hp=Math.min(S.mhp,S.hp+heal);fl('+'+fuel+' FUEL',player.x,player.y-32,'#e7ba67');if(heal)fl('+'+heal+' HULL',player.x,player.y-46,'#9ee0bb');msg('DRIVE COLLAPSE // unused echoes folded into Fuel'+(heal?' and Hull.':'.'))}S.echoes=0}}")
+          text=text.replace("document.getElementById('resT').textContent=Math.floor(S.res);","document.getElementById('resT').textContent=S.drive>0?('DRIVE '+S.echoes+'/'+S.driveMax):Math.floor(S.res);")
+          text=text.replace("document.getElementById('resF').style.width=S.res+'%'","document.getElementById('resF').style.width=(S.drive>0?100*(S.drive/4.2):S.res)+'%';document.getElementById('burst').classList.toggle('on',S.drive>0)")
+          text=text.replace("for(const b of S.eshots){x.fillStyle=b.g?'#aee9ff':'#df89b9';x.beginPath();x.arc(b.x,b.y,b.r,0,7);x.fill()}","for(const b of S.eshots){x.fillStyle=b.g?'#aee9ff':'#df89b9';x.beginPath();x.arc(b.x,b.y,b.r,0,7);x.fill()}if(S.drive>0&&S.echoes){let n=Math.min(S.echoes,18),time=performance.now()/420;for(let i=0;i<n;i++){let a=time+i*Math.PI*2/n,rr=28+(i%3)*5,ex=player.x+Math.cos(a)*rr,ey=player.y+Math.sin(a)*rr;x.fillStyle=i%2?'#c9a2ff':'#7fd7ff';x.beginPath();x.arc(ex,ey,3+(i%3===0),0,7);x.fill();x.strokeStyle='rgba(201,162,255,.16)';x.beginPath();x.moveTo(player.x,player.y);x.lineTo(ex,ey);x.stroke()}}")
+          text=text.replace("S.res=S.chain=S.score=0;S.enemies=[];","S.res=S.chain=S.score=0;S.drive=0;S.echoes=0;S.enemies=[];")
+          p.write_text(text)
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name 'pandoras-arcade-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add games/veil-gear/index.html
+          git commit -m 'Replace BURST with Resonance Drive' || exit 0
+          git push
