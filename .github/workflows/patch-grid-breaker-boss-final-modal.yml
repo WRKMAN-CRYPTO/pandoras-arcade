@@ -24,3 +24,4 @@ jobs:
           git add games/wip/index.html
           git commit -m 'Compact GRID BREAKER boss final modal' || exit 0
           git push
+# trigger
