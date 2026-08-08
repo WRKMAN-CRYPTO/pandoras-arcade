@@ -50,7 +50,7 @@ h1,h2{margin:0 0 8px}h1{font-size:21px}h2{font-size:16px}.small{font-size:10px;l
   </div>
   <div id="stage">
     <canvas id="g"></canvas>
-    <div id="banner">Drag to steer • Frame leads your fingertip • WIP lean humanoid frame</div>
+    <div id="banner">Drag to steer • Frame leads your fingertip • Humanoid Gear v4 • forward charge pose</div>
     <div id="msg">Graze bullets to build Resonance. SKIRMISH tags. GEAR detonates tags.</div>
   </div>
   <div id="controls">
@@ -234,9 +234,9 @@ function draw(){
  const mechSecondary=S.mode==='skirmish'?'#546985':'#6b5438';
  const mechAccent=S.mode==='skirmish'?'#7fd7ff':'#ffb06a';
  const mechTrim=S.mode==='skirmish'?'#e8f1fb':'#f0dfbf';
- const lean=-0.18;
+ const lean=0.18;
  const bob=Math.sin(performance.now()*0.008)*1.4;
- x.rotate(lean);x.translate(0,bob-2);
+ x.rotate(lean);x.translate(2,bob-4);
  x.globalAlpha*=0.48;x.fillStyle='#05070d';x.beginPath();x.ellipse(0,28,14,4,0,0,Math.PI*2);x.fill();x.globalAlpha/=0.48;
  x.fillStyle=mechSecondary;x.beginPath();x.moveTo(-13,-20);x.lineTo(-8,-33);x.lineTo(-4,-17);x.closePath();x.fill();x.beginPath();x.moveTo(13,-20);x.lineTo(8,-33);x.lineTo(4,-17);x.closePath();x.fill();
  x.fillStyle=mechPrimary;x.beginPath();x.moveTo(-7,4);x.lineTo(-1,4);x.lineTo(0,16);x.lineTo(-5,17);x.lineTo(-9,11);x.closePath();x.fill();x.fillStyle=mechSecondary;x.beginPath();x.moveTo(-5,17);x.lineTo(0,16);x.lineTo(2,31);x.lineTo(-4,33);x.lineTo(-8,23);x.closePath();x.fill();x.fillStyle=mechTrim;x.fillRect(-4,31,7,3);x.fillStyle=mechAccent;x.fillRect(-3,25,4,5);
