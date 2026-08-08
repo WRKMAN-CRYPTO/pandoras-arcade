@@ -21,3 +21,4 @@ jobs:
           git add index.html games/wip/index.html
           git commit -m 'Add persistent WIP cabinet and current VEIL GEAR art pass' || exit 0
           git push
+# trigger
