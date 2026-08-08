@@ -1,0 +1,26 @@
+name: Patch GRID BREAKER choice tiles
+on:
+  push:
+    paths:
+      - '.github/workflows/patch-grid-breaker-choice-tiles.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch choice tiles
+        run: python scripts/patch_grid_breaker_choice_tiles.py
+      - name: Verify and commit
+        run: |
+          grep -q "CHOICE TILE PASS V1" games/wip/index.html
+          grep -q "b.textContent=c.desc+' = '+c.label" games/wip/index.html
+          grep -q "font:1000 21px/1.2" games/wip/index.html
+          git config user.name 'pandoras-arcade-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add games/wip/index.html
+          git commit -m 'Center equations in GRID BREAKER answer tiles' || exit 0
+          git push
