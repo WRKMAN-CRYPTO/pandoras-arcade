@@ -38,3 +38,4 @@ jobs:
           git add games/wip/index.html index.html
           git commit -m 'Publish VAULT CHOIR one-shot build' || exit 0
           git push
+# trigger
