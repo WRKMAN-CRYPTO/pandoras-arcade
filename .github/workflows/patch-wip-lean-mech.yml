@@ -21,3 +21,4 @@ jobs:
           git add games/wip/index.html
           git commit -m 'Update WIP VEIL GEAR lean mech silhouette' || exit 0
           git push
+# trigger
