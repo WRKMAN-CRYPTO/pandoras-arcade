@@ -54,7 +54,7 @@ h1,h2{margin:0 0 8px}h1{font-size:21px}h2{font-size:16px}.small{font-size:10px;l
     <div id="msg">Graze bullets to build Resonance. SKIRMISH tags. GEAR detonates tags.</div>
   </div>
   <div id="controls">
-    <button class="ctrl" id="burst">BURST</button>
+    <button class="ctrl" id="burst">RESONANCE DRIVE</button>
     <button class="ctrl big" id="shift">SHIFT → GEAR</button>
     <button class="ctrl" id="codex">CODEX</button>
   </div>
@@ -67,7 +67,7 @@ h1,h2{margin:0 0 8px}h1{font-size:21px}h2{font-size:16px}.small{font-size:10px;l
     <div><b>MOVE</b><br>Drag anywhere. The frame flies above your finger so you can see it.</div>
     <div><b>SKIRMISH</b><br>Fast spread fire. Hits build TAG on enemies.</div>
     <div><b>GEAR</b><br>Slow heavy fire. Consumes Fuel and detonates TAG for bonus damage.</div>
-    <div><b>RESONANCE</b><br>Graze enemy bullets. Spend it on BURST to fracture defenses and erase nearby fire.</div>
+    <div><b>RESONANCE</b><br>Graze enemy bullets. Spend 30 Resonance to enter DRIVE. Graze bullets into captured echoes, then SHIFT to cash them out.</div>
   </div>
   <button class="bigbtn" id="boot">DESCEND INTO THE CLOUDS</button>
 </div></div>
@@ -79,7 +79,7 @@ h1,h2{margin:0 0 8px}h1{font-size:21px}h2{font-size:16px}.small{font-size:10px;l
 'use strict';
 const C=document.getElementById('g'),x=C.getContext('2d');let W=0,H=0,D=1,last=0,audio=null,busy=false;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),pick=a=>a[Math.floor(Math.random()*a.length)];
-const S={run:false,wave:1,mode:'skirmish',hp:100,mhp:100,fuel:100,mfuel:100,res:0,chain:0,score:0,shotT:0,spawnT:0,enemies:[],shots:[],eshots:[],parts:[],floats:[],mods:[],boss:false};
+const S={run:false,wave:1,mode:'skirmish',hp:100,mhp:100,fuel:100,mfuel:100,res:0,chain:0,score:0,shotT:0,spawnT:0,enemies:[],shots:[],eshots:[],parts:[],floats:[],mods:[],boss:false,drive:0,echoes:0,driveMax:18};
 let pointer={down:false,x:0,y:0},player={x:0,y:0,r:12,inv:0};
 const TOUCH_LEAD=64;
 const SAVE='veilGearSaveV1';let meta=JSON.parse(localStorage.getItem(SAVE)||'{"codex":{},"best":0}');
@@ -94,7 +94,7 @@ const enemies=[
 const mods=[
  ['Copper Choir','SKIRMISH tags build 50% faster.','tag'],
  ['Funeral Engine','GEAR detonations refund 3 Fuel per tag.','refund'],
- ['Broken Halo','BURST costs 15 Resonance instead of 20.','cheap'],
+ ['Broken Halo','RESONANCE DRIVE costs 24 instead of 30.','cheap'],
  ['Saint’s Rib','Fractured enemies take +25% from all shots.','fracture'],
  ['Red Testament','At 40+ Resonance, GEAR shots gain piercing.','pierce'],
  ['Pilgrim Skin','Graze radius is larger and Hull repairs 1 per 8 grazes.','graze'],
@@ -102,7 +102,7 @@ const mods=[
  ['Widow Rail','GEAR shots pierce any FRACTURED target, regardless of Resonance.','fractPierce'],
  ['Blue Heresy','SKIRMISH shots add double TAG to FRACTURED targets.','fractTag'],
  ['Grave Echo','GEAR detonations splash 35% of their bonus damage to nearby enemies.','splash'],
- ['Choir Furnace','BURST converts erased bullets into Fuel.','burstFuel'],
+ ['Choir Furnace','Each captured echo grants +1 Fuel while DRIVE is active.','burstFuel'],
  ['Second Gospel','Detonating 6+ TAG refreshes FRACTURE for 1.5 seconds.','refresh']
 ];
 function has(id){return S.mods.some(m=>m[2]===id)}
@@ -153,15 +153,27 @@ function hitEnemy(e,s){
  if(e.hp<=0){S.chain++;S.score+=100+S.chain*10;part(e.x,e.y,'#f3d78a',18);tone(110,.08,.025);S.enemies.splice(S.enemies.indexOf(e),1)}
 }
 function burst(){
- if(!S.run||busy)return;let cost=has('cheap')?15:20;if(S.res<cost){msg('Need '+cost+' Resonance for BURST. Graze enemy fire.');tone(100,.08,.02);return}
- S.res-=cost;navigator.vibrate?.([18,30,18]);tone(90,.18,.04,'sawtooth');part(player.x,player.y,'#c9a2ff',30);
- let before=S.eshots.length;S.eshots=S.eshots.filter(b=>Math.hypot(b.x-player.x,b.y-player.y)>110);let erased=before-S.eshots.length;if(has('burstFuel')&&erased){let gain=Math.min(30,erased*2);S.fuel=Math.min(S.mfuel,S.fuel+gain);fl('+'+gain+' FUEL',player.x,player.y-30,'#e7ba67')}
- let hit=0;S.enemies.forEach(e=>{if(Math.hypot(e.x-player.x,e.y-player.y)<180){e.fract=2.8;e.adapt=null;hit++;fl('FRACTURE',e.x,e.y-35,'#c9a2ff')}});
- if(hit)learn('fracture','BURST fractures armor and clears adaptive resistance.');
- msg('BURST // '+hit+' target'+(hit===1?'':'s')+' fractured. Nearby fire erased.');hud()
+ if(!S.run||busy)return;
+ if(S.drive>0){msg('DRIVE already active // keep grazing, then SHIFT to release the echoes.');tone(720,.05,.01);return}
+ let cost=has('cheap')?24:30;if(S.res<cost){msg('Need '+cost+' Resonance for DRIVE. Graze enemy fire.');tone(100,.08,.02);return}
+ S.res-=cost;S.drive=4.2;S.echoes=0;navigator.vibrate?.([18,26,18]);tone(95,.2,.045,'sawtooth');part(player.x,player.y,'#c9a2ff',28);msg('RESONANCE DRIVE // graze bullets into echoes. SHIFT before the timer dies.');learn('drive','During DRIVE, grazing captures enemy fire as echoes. SHIFT determines how the echoes are released.');hud()
+}
+function releaseDrive(targetMode){
+ if(S.drive<=0||S.echoes<=0){S.drive=0;S.echoes=0;return}
+ let n=S.echoes;
+ if(targetMode==='gear'){
+   let lanes=Math.min(9,3+Math.floor(n/2));for(let i=0;i<lanes;i++){let spread=(i-(lanes-1)/2)*22;S.shots.push({x:player.x,y:player.y-16,vx:spread,vy:-500,r:5,d:10+Math.floor(n*.8),type:'g',pierce:true,echo:true})}
+   fl('ECHO LANCE x'+lanes,player.x,player.y-35,'#ffcf8c');msg('DRIVE RELEASE // captured fire becomes a piercing GEAR volley.');tone(120,.2,.04,'sawtooth')
+ }else{
+   let targets=[...S.enemies].sort((a,b)=>Math.hypot(a.x-player.x,a.y-player.y)-Math.hypot(b.x-player.x,b.y-player.y));let pool=Math.max(1,n);targets.forEach((e,i)=>{let add=Math.max(1,Math.ceil((pool/(i+1))*.55));e.tag=Math.min(8,e.tag+add);fl('+TAG '+add,e.x,e.y-30,'#7fd7ff')});
+   for(let i=0;i<Math.min(18,n);i++){let a=Math.PI*2*i/Math.min(18,n);S.shots.push({x:player.x,y:player.y,vx:Math.cos(a)*180,vy:Math.sin(a)*180,r:3,d:4,type:'s',echo:true})}
+   msg('DRIVE RELEASE // captured fire blooms outward as TAG pressure.');tone(620,.14,.03,'triangle')
+ }
+ navigator.vibrate?.([12,18,28]);part(player.x,player.y,targetMode==='gear'?'#ffb06a':'#7fd7ff',26);S.drive=0;S.echoes=0
 }
 function shift(){
  if(!S.run)return;
+ let next=S.mode==='skirmish'?'gear':'skirmish';if(S.drive>0&&S.echoes>0)releaseDrive(next);
  if(S.mode==='skirmish'){S.mode='gear';msg('GEAR MODE // heavy cannon online. Fuel drains while firing.');tone(120,.14,.03,'sawtooth');navigator.vibrate?.(25)}
  else{S.mode='skirmish';msg('SKIRMISH MODE // spread guns online. Build TAG.');tone(480,.08,.02)}
  document.getElementById('shift').textContent=S.mode==='skirmish'?'SHIFT → GEAR':'SHIFT → SKIRMISH';document.getElementById('shift').classList.toggle('on',S.mode==='gear');hud()
@@ -183,9 +195,9 @@ function update(dt){
    if(b.x<-20||b.x>W+20||b.y>H+20){S.eshots.splice(S.eshots.indexOf(b),1);continue}
    let d=Math.hypot(b.x-player.x,b.y-player.y),graze=has('graze')?34:29;
    if(d<player.r+b.r){S.eshots.splice(S.eshots.indexOf(b),1);damage(10);continue}
-   if(d<graze&&!b.g){b.g=true;S.res=Math.min(100,S.res+4);S.chain++;part(b.x,b.y,'#7fd7ff',3);tone(720,.025,.006);if(has('graze')&&S.chain%8===0)S.hp=Math.min(S.mhp,S.hp+1);learn('graze','Grazing bullets builds Resonance without taking damage.')}
+   if(d<graze&&!b.g){b.g=true;S.chain++;if(S.drive>0){S.echoes=Math.min(S.driveMax,S.echoes+1);S.eshots.splice(S.eshots.indexOf(b),1);part(b.x,b.y,'#c9a2ff',5);fl('ECHO '+S.echoes,player.x,player.y-32,'#c9a2ff');tone(840,.035,.008,'triangle');if(has('burstFuel'))S.fuel=Math.min(S.mfuel,S.fuel+1)}else{S.res=Math.min(100,S.res+4);part(b.x,b.y,'#7fd7ff',3);tone(720,.025,.006);if(has('graze')&&S.chain%8===0)S.hp=Math.min(S.mhp,S.hp+1);learn('graze','Grazing bullets builds Resonance without taking damage.')}}
  }
- if(S.mode==='skirmish')S.fuel=Math.min(S.mfuel,S.fuel+10*dt);
+ if(S.mode==='skirmish')S.fuel=Math.min(S.mfuel,S.fuel+10*dt);if(S.drive>0){S.drive=Math.max(0,S.drive-dt);if(S.drive===0){if(S.echoes){let fuel=Math.min(24,S.echoes*2),heal=Math.floor(S.echoes/4);S.fuel=Math.min(S.mfuel,S.fuel+fuel);S.hp=Math.min(S.mhp,S.hp+heal);fl('+'+fuel+' FUEL',player.x,player.y-32,'#e7ba67');if(heal)fl('+'+heal+' HULL',player.x,player.y-46,'#9ee0bb');msg('DRIVE COLLAPSE // unused echoes folded into Fuel'+(heal?' and Hull.':'.'))}S.echoes=0}}
  if(S.score>0&&S.score>=S.wave*900&&!S.boss){S.boss=true;S.enemies=[];S.eshots=[];spawnEnemy(true);msg('PALE ARCHON // something in the machine recognizes it.')}
  if(S.boss&&!S.enemies.some(e=>e.id==='archon')){S.boss=false;S.wave++;S.score=0;upgrade()}
  hud()
@@ -197,14 +209,14 @@ function upgrade(){
  showModal('VEIL RELIC','The frame opens a chamber that was not there before.',opts.map(m=>[m[0],m[1],()=>{if(m[2]==='heal')S.hp=Math.min(S.mhp,S.hp+35);else if(m[2]==='fuel'){S.mfuel+=10;S.fuel=S.mfuel}else if(m[2]==='res')S.res=50;else S.mods.push(m);hideModal();S.run=true;msg('WAVE '+S.wave+' // the clouds are thinning.')}]),false)
 }
 function lose(){S.run=false;meta.best=Math.max(meta.best,S.wave);localStorage.setItem(SAVE,JSON.stringify(meta));showModal('FRAME DOWN','Lyra wakes to the same voice: “Again.”',[['RESTART','Codex knowledge persists.',()=>{hideModal();newRun()}]],false)}
-function hud(){document.getElementById('wave').textContent='WAVE '+S.wave;document.getElementById('hpT').textContent=Math.max(0,Math.ceil(S.hp))+'/'+S.mhp;document.getElementById('fuelT').textContent=Math.ceil(S.fuel)+'/'+S.mfuel;document.getElementById('resT').textContent=Math.floor(S.res);document.getElementById('chainT').textContent='x'+S.chain;document.getElementById('modeT').textContent=S.mode.toUpperCase();document.getElementById('hpF').style.width=100*clamp(S.hp/S.mhp,0,1)+'%';document.getElementById('fuelF').style.width=100*clamp(S.fuel/S.mfuel,0,1)+'%';document.getElementById('resF').style.width=S.res+'%'}
+function hud(){document.getElementById('wave').textContent='WAVE '+S.wave;document.getElementById('hpT').textContent=Math.max(0,Math.ceil(S.hp))+'/'+S.mhp;document.getElementById('fuelT').textContent=Math.ceil(S.fuel)+'/'+S.mfuel;document.getElementById('resT').textContent=S.drive>0?('DRIVE '+S.echoes+'/'+S.driveMax):Math.floor(S.res);document.getElementById('chainT').textContent='x'+S.chain;document.getElementById('modeT').textContent=S.mode.toUpperCase();document.getElementById('hpF').style.width=100*clamp(S.hp/S.mhp,0,1)+'%';document.getElementById('fuelF').style.width=100*clamp(S.fuel/S.mfuel,0,1)+'%';document.getElementById('resF').style.width=(S.drive>0?100*(S.drive/4.2):S.res)+'%';document.getElementById('burst').classList.toggle('on',S.drive>0)}
 function draw(){
  x.clearRect(0,0,W,H);
  let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0e1730');g.addColorStop(.5,'#10172a');g.addColorStop(1,'#050711');x.fillStyle=g;x.fillRect(0,0,W,H);
  for(let i=0;i<45;i++){let yy=(i*73+(performance.now()*.02))%H;x.fillStyle='rgba(190,210,255,.12)';x.fillRect((i*97)%W,yy,1,1)}
  if(S.mode==='gear'){x.fillStyle='rgba(255,176,106,.05)';x.fillRect(0,0,W,H)}
  for(const s of S.shots){x.fillStyle=s.type==='s'?'#7fd7ff':'#ffb06a';x.fillRect(s.x-s.r,s.y-8,s.r*2,12)}
- for(const b of S.eshots){x.fillStyle=b.g?'#aee9ff':'#df89b9';x.beginPath();x.arc(b.x,b.y,b.r,0,7);x.fill()}
+ for(const b of S.eshots){x.fillStyle=b.g?'#aee9ff':'#df89b9';x.beginPath();x.arc(b.x,b.y,b.r,0,7);x.fill()}if(S.drive>0&&S.echoes){let n=Math.min(S.echoes,18),time=performance.now()/420;for(let i=0;i<n;i++){let a=time+i*Math.PI*2/n,rr=28+(i%3)*5,ex=player.x+Math.cos(a)*rr,ey=player.y+Math.sin(a)*rr;x.fillStyle=i%2?'#c9a2ff':'#7fd7ff';x.beginPath();x.arc(ex,ey,3+(i%3===0),0,7);x.fill();x.strokeStyle='rgba(201,162,255,.16)';x.beginPath();x.moveTo(player.x,player.y);x.lineTo(ex,ey);x.stroke()}}
  for(const e of S.enemies){
    x.save();x.translate(e.x,e.y);x.fillStyle=e.id==='wisp'?'#b4c9df':e.id==='shell'?'#8b826d':e.id==='choir'?'#826c9d':'#d2c0a0';
    if(e.id==='wisp'){x.fillRect(-13,-12,26,24);x.fillStyle='#7fd7ff';x.fillRect(-4,-4,8,8)}
@@ -230,7 +242,7 @@ function loop(t){let dt=Math.min(.033,(t-last)/1000||.016);last=t;update(dt);req
 function showModal(title,sub,choices=[],closable=true){document.getElementById('mt').textContent=title;document.getElementById('ms').textContent=sub;let l=document.getElementById('ml');l.innerHTML='';choices.forEach(([n,d,fn])=>{let b=document.createElement('button');b.className='choice';b.innerHTML='<strong>'+n+'</strong><span>'+d+'</span>';b.onclick=fn;l.appendChild(b)});document.getElementById('close').style.display=closable?'block':'none';document.getElementById('modal').classList.add('on')}
 function hideModal(){document.getElementById('modal').classList.remove('on')}
 function codex(){let rows=enemies.map(e=>[e.name+' • '+e.armor.toUpperCase(),e.note,()=>{}]).concat(Object.entries(meta.codex).map(([k,v])=>[k.toUpperCase(),v,()=>{}]));showModal('VEIL CODEX','Knowledge the frame chose to keep.',rows,true)}
-function newRun(){S.wave=1;S.mode='skirmish';S.hp=S.mhp=100;S.fuel=S.mfuel=100;S.res=S.chain=S.score=0;S.enemies=[];S.shots=[];S.eshots=[];S.parts=[];S.floats=[];S.mods=[];S.boss=false;S.spawnT=.5;player.x=W*.5;player.y=H*.8;S.run=true;hud();msg('SKIRMISH fire tags. GEAR fire detonates. Graze for Resonance.')}
+function newRun(){S.wave=1;S.mode='skirmish';S.hp=S.mhp=100;S.fuel=S.mfuel=100;S.res=S.chain=S.score=0;S.drive=0;S.echoes=0;S.enemies=[];S.shots=[];S.eshots=[];S.parts=[];S.floats=[];S.mods=[];S.boss=false;S.spawnT=.5;player.x=W*.5;player.y=H*.8;S.run=true;hud();msg('SKIRMISH fire tags. GEAR fire detonates. Graze for Resonance.')}
 C.addEventListener('pointerdown',e=>{if(!S.run)return;pointer.down=true;let r=C.getBoundingClientRect();pointer.x=e.clientX-r.left;pointer.y=e.clientY-r.top;player.x=clamp(pointer.x,18,W-18);player.y=clamp(pointer.y-TOUCH_LEAD,55,H-25);try{C.setPointerCapture(e.pointerId)}catch(_){}},{passive:false});
 C.addEventListener('pointermove',e=>{if(!pointer.down||!S.run)return;e.preventDefault();let r=C.getBoundingClientRect();pointer.x=e.clientX-r.left;pointer.y=e.clientY-r.top;player.x=clamp(pointer.x,18,W-18);player.y=clamp(pointer.y-TOUCH_LEAD,55,H-25)},{passive:false});
 ['pointerup','pointercancel','lostpointercapture'].forEach(t=>C.addEventListener(t,e=>{pointer.down=false},{passive:false}));
