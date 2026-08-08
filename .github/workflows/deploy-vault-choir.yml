@@ -1,0 +1,40 @@
+name: Deploy VAULT CHOIR one shot
+on:
+  push:
+    paths:
+      - '.github/workflows/deploy-vault-choir.yml'
+permissions:
+  contents: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Build one-shot release
+        run: python scripts/deploy_vault_choir.py
+      - name: Validate cartridge
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('games/wip/index.html').read_text()
+          js=s.split('<script>',1)[1].split('</script>',1)[0]
+          Path('/tmp/vault-choir.js').write_text(js)
+          ids=['ember','veil','root','echo','glass']
+          for i,a in enumerate(ids):
+              for b in ids[i:]:
+                  assert "'"+a+'+'+b+"':" in s,(a,b)
+          assert 'WIP // VAULT//CHOIR' in Path('index.html').read_text()
+          print('15 interactions + launcher markers OK')
+          PY
+          node --check /tmp/vault-choir.js
+          grep -q 'THE LISTENING DOOR' games/wip/index.html
+          grep -q 'ONE SHOT BUILD' index.html
+      - name: Publish exactly once
+        run: |
+          git config user.name 'pandoras-arcade-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add games/wip/index.html index.html
+          git commit -m 'Publish VAULT CHOIR one-shot build' || exit 0
+          git push
