@@ -26,3 +26,4 @@ jobs:
           git add games/wip/index.html
           git commit -m 'Give GRID BREAKER its final juice pass' || exit 0
           git push
+# trigger
