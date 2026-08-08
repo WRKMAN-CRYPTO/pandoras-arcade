@@ -21,3 +21,4 @@ jobs:
           git add games/wip/index.html
           git commit -m 'Add GRID BREAKER enemy reactions and combo escalation' || exit 0
           git push
+# trigger
