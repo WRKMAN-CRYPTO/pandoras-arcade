@@ -21,3 +21,4 @@ jobs:
           git add games/wip/index.html
           git commit -m 'Prevent consecutive GRID BREAKER problems' || exit 0
           git push
+# trigger
