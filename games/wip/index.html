@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#070914">
+<title>VEIL//GEAR — WIP</title>
+<style>
+:root{--t:max(10px,env(safe-area-inset-top));--b:max(10px,env(safe-area-inset-bottom));--ink:#eef6ff;--muted:#9bacbd}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none;touch-action:none}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050711;color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+body{position:fixed;inset:0}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;background:radial-gradient(circle at 50% 0,#18233f,#080b16 48%,#04060c)}
+#hud{padding:var(--t) 8px 6px;display:grid;grid-template-columns:1.35fr 1fr;gap:7px}
+.panel{background:#0f1626e8;border:1px solid #30405b;border-radius:11px;padding:7px}
+.r{display:flex;justify-content:space-between;gap:8px;font-size:9px;line-height:1.45}.r b{font-size:10px}
+.bar{height:6px;border-radius:99px;background:#05070c;overflow:hidden;margin:3px 0}.fill{height:100%;background:#d86d70;transition:width .14s}.fuel{background:#e7ba67}.res{background:#7fd7ff}
+#stage{position:relative;flex:1;min-height:0;margin:0 7px 6px;border:1px solid #263550;border-radius:14px;overflow:hidden;background:#060912}
+canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+#banner{position:absolute;left:8px;right:8px;top:8px;padding:6px 8px;border-radius:9px;background:#05080de8;border:1px solid #31415c;text-align:center;font-size:9px;font-weight:1000;line-height:1.35}
+#msg{position:absolute;left:8px;right:8px;bottom:8px;min-height:30px;padding:6px 8px;border-radius:9px;background:#05080de8;border:1px solid #31415c;text-align:center;font-size:9px;line-height:1.35;color:#d7e3ef}
+#controls{padding:0 8px var(--b);display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.ctrl{min-height:48px;border-radius:12px;border:1px solid #3c4e69;background:linear-gradient(#27344a,#151d2a);color:#eef6ff;font:900 10px ui-monospace,monospace}
+.ctrl.big{font-size:11px;background:linear-gradient(#5c456f,#2f243b)}
+.ctrl.on{box-shadow:0 0 0 2px #7fd7ff55,inset 0 0 18px #7fd7ff22}
+#start,.modal{position:fixed;inset:0;z-index:20;background:#03050aef;display:none;align-items:center;justify-content:center;padding:calc(var(--t) + 10px) 12px calc(var(--b) + 10px)}
+#start{display:flex}.modal.on{display:flex}
+.card{width:min(94vw,560px);max-height:calc(100dvh - var(--t) - var(--b) - 28px);overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;background:#111827;border:1px solid #3a4c69;border-radius:16px;padding:15px}
+h1,h2{margin:0 0 8px}h1{font-size:21px}h2{font-size:16px}.small{font-size:10px;line-height:1.5;color:#a6b6c7}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.legend div{background:#0a0f19;border:1px solid #27364c;border-radius:10px;padding:8px;font-size:8px;line-height:1.4}
+.bigbtn,.choice{width:100%;margin-top:8px;padding:11px;border-radius:11px;border:1px solid #425777;background:#223048;color:#eef6ff;font:900 10px ui-monospace,monospace}
+.bigbtn{background:#4b395e}.choice{text-align:left}.choice strong{display:block}.choice span{display:block;margin-top:3px;font-size:9px;color:#a9b8c8;line-height:1.35}
+@media(min-width:700px){#app{max-width:620px;left:50%;transform:translateX(-50%);border-left:1px solid #1b2638;border-right:1px solid #1b2638}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="hud">
+    <div class="panel">
+      <div class="r"><b>LYRA // VEIL FRAME</b><span id="wave">WAVE 1</span></div>
+      <div class="r"><span>Hull</span><span id="hpT">100/100</span></div><div class="bar"><div class="fill" id="hpF"></div></div>
+      <div class="r"><span>Fuel</span><span id="fuelT">100/100</span></div><div class="bar"><div class="fill fuel" id="fuelF"></div></div>
+    </div>
+    <div class="panel">
+      <div class="r"><span>Mode</span><b id="modeT">SKIRMISH</b></div>
+      <div class="r"><span>Resonance</span><span id="resT">0</span></div><div class="bar"><div class="fill res" id="resF"></div></div>
+      <div class="r"><span>Chain</span><b id="chainT">x0</b></div>
+    </div>
+  </div>
+  <div id="stage">
+    <canvas id="g"></canvas>
+    <div id="banner">Drag to steer • Frame leads your fingertip • WIP humanoid frame</div>
+    <div id="msg">Graze bullets to build Resonance. SKIRMISH tags. GEAR detonates tags.</div>
+  </div>
+  <div id="controls">
+    <button class="ctrl" id="burst">RESONANCE DRIVE</button>
+    <button class="ctrl big" id="shift">SHIFT → GEAR</button>
+    <button class="ctrl" id="codex">CODEX</button>
+  </div>
+</div>
+
+<div id="start"><div class="card">
+  <h1>VEIL//GEAR</h1>
+  <div class="small">Lyra Venn was told the machine beneath her village was a tomb. It woke when she touched it.<br><br>Now something above the clouds is calling the frame by a name she has never heard.</div>
+  <div class="legend">
+    <div><b>MOVE</b><br>Drag anywhere. The frame flies above your finger so you can see it.</div>
+    <div><b>SKIRMISH</b><br>Fast spread fire. Hits build TAG on enemies.</div>
+    <div><b>GEAR</b><br>Slow heavy fire. Consumes Fuel and detonates TAG for bonus damage.</div>
+    <div><b>RESONANCE</b><br>Graze enemy bullets. Spend 30 Resonance to enter DRIVE. Graze bullets into captured echoes, then SHIFT to cash them out.</div>
+  </div>
+  <button class="bigbtn" id="boot">DESCEND INTO THE CLOUDS</button>
+</div></div>
+
+<div class="modal" id="modal"><div class="card"><h2 id="mt"></h2><div class="small" id="ms"></div><div id="ml"></div><button class="bigbtn" id="close">RETURN</button></div></div>
+
+<script>
+(()=>{
+'use strict';
+const C=document.getElementById('g'),x=C.getContext('2d');let W=0,H=0,D=1,last=0,audio=null,busy=false;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),pick=a=>a[Math.floor(Math.random()*a.length)];
+const S={run:false,wave:1,mode:'skirmish',hp:100,mhp:100,fuel:100,mfuel:100,res:0,chain:0,score:0,shotT:0,spawnT:0,enemies:[],shots:[],eshots:[],parts:[],floats:[],mods:[],boss:false,drive:0,echoes:0,driveMax:18};
+let pointer={down:false,x:0,y:0},player={x:0,y:0,r:12,inv:0};
+const TOUCH_LEAD=64;
+const SAVE='veilGearSaveV1';let meta=JSON.parse(localStorage.getItem(SAVE)||'{"codex":{},"best":0}');
+const enemies=[
+ {id:'wisp',name:'Halo Wisp',hp:32,r:15,speed:38,armor:'none',note:'Tags amplify heavy GEAR shots.'},
+ {id:'shell',name:'Aegis Shell',hp:54,r:18,speed:26,armor:'plate',note:'Plate halves GEAR damage until a GEAR Drive-release fractures it.'},
+ {id:'choir',name:'Choir Needle',hp:40,r:14,speed:44,armor:'veil',note:'Veil reduces SKIRMISH tagging. A GEAR Drive-release can fracture it.'},
+ {id:'lancer',name:'Orbit Lancer',hp:46,r:16,speed:31,armor:'none',note:'Its fan leaves deliberate graze lanes between bullets.'},
+ {id:'bell',name:'Vesper Bell',hp:48,r:17,speed:27,armor:'none',note:'Its slow halo rewards staying close enough to graze the ring.'},
+ {id:'archon',name:'Pale Archon',hp:210,r:30,speed:18,armor:'adaptive',note:'Alternating forms prevents adaptation from hardening.'}
+];
+const mods=[
+ ['Copper Choir','SKIRMISH tags build 50% faster.','tag'],
+ ['Funeral Engine','GEAR detonations refund 3 Fuel per tag.','refund'],
+ ['Broken Halo','RESONANCE DRIVE costs 24 instead of 30.','cheap'],
+ ['Saint’s Rib','Fractured enemies take +25% from all shots.','fracture'],
+ ['Red Testament','At 40+ Resonance, GEAR shots gain piercing.','pierce'],
+ ['Pilgrim Skin','Graze radius is larger and Hull repairs 1 per 8 grazes.','graze'],
+ ['Halo Debt','Every third graze adds 1 TAG to the nearest enemy.','grazeTag'],
+ ['Widow Rail','GEAR shots pierce any FRACTURED target, regardless of Resonance.','fractPierce'],
+ ['Blue Heresy','SKIRMISH shots add double TAG to FRACTURED targets.','fractTag'],
+ ['Grave Echo','GEAR detonations splash 35% of their bonus damage to nearby enemies.','splash'],
+ ['Choir Furnace','Each captured echo grants +1 Fuel while DRIVE is active.','burstFuel'],
+ ['Second Gospel','Detonating 6+ TAG refreshes FRACTURE for 1.5 seconds.','refresh']
+];
+function has(id){return S.mods.some(m=>m[2]===id)}
+function rs(){D=Math.min(devicePixelRatio||1,2);W=C.clientWidth;H=C.clientHeight;C.width=W*D;C.height=H*D;x.setTransform(D,0,0,D,0,0);if(!player.x){player.x=W*.5;player.y=H*.8}}
+addEventListener('resize',rs);rs();
+function tone(f=300,d=.06,v=.02,type='square'){if(!audio)return;try{let o=audio.createOscillator(),g=audio.createGain(),n=audio.currentTime;o.type=type;o.frequency.value=f;g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(v,n+.008);g.gain.exponentialRampToValueAtTime(.0001,n+d);o.connect(g).connect(audio.destination);o.start();o.stop(n+d+.01)}catch(_){}}
+function bootAudio(){if(audio)return;try{audio=new(window.AudioContext||window.webkitAudioContext)()}catch(_){}}
+function msg(t){document.getElementById('msg').textContent=t}
+function learn(k,t){if(meta.codex[k])return;meta.codex[k]=t;localStorage.setItem(SAVE,JSON.stringify(meta));msg('CODEX // '+t);tone(680,.11,.02,'triangle')}
+function fl(t,px,py,c='#fff'){S.floats.push({t,px,py,c,life:.7})}
+function part(px,py,c,n=8){for(let i=0;i<n;i++)S.parts.push({x:px,y:py,vx:(Math.random()-.5)*120,vy:(Math.random()-.5)*120,t:.45,c})}
+function spawnEnemy(forceBoss=false){
+ let def=forceBoss?enemies[5]:pick(enemies.slice(0,5));let e={...def,x:40+Math.random()*(W-80),y:-35,hp:def.hp+(S.wave-1)*5,mhp:def.hp+(S.wave-1)*5,tag:0,fract:0,shot:0,adapt:null};
+ S.enemies.push(e)
+}
+function shootPlayer(dt){
+ S.shotT-=dt;if(S.shotT>0)return;
+ if(S.mode==='skirmish'){
+   S.shotT=.12;[-.16,0,.16].forEach(a=>S.shots.push({x:player.x,y:player.y-12,vx:Math.sin(a)*95,vy:-360,r:3,d:5,type:'s'}));tone(520,.025,.006)
+ }else{
+   if(S.fuel<=0){shift();return}
+   S.fuel=Math.max(0,S.fuel-.8);S.shotT=.22;S.shots.push({x:player.x,y:player.y-18,vx:0,vy:-430,r:5,d:15,type:'g',pierce:has('pierce')&&S.res>=40});tone(170,.04,.01,'sawtooth')
+ }
+}
+function enemyFire(e){
+ let dx=player.x-e.x,dy=player.y-e.y,l=Math.hypot(dx,dy)||1,sp=e.id==='archon'?150:120;
+ if(e.id==='lancer'){let base=Math.atan2(dy,dx),speed=108;[-.46,-.23,0,.23,.46].forEach(a=>S.eshots.push({x:e.x,y:e.y+8,vx:Math.cos(base+a)*speed,vy:Math.sin(base+a)*speed,r:4}));return}
+ if(e.id==='bell'){let n=10,speed=72,spin=(performance.now()/900)%6.28;for(let i=0;i<n;i++){let a=spin+i*(Math.PI*2/n);S.eshots.push({x:e.x,y:e.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:4})}return}
+ S.eshots.push({x:e.x,y:e.y+10,vx:dx/l*sp,vy:dy/l*sp,r:e.id==='archon'?5:4});
+ if(e.id==='archon')S.eshots.push({x:e.x,y:e.y+10,vx:dx/l*sp+45,vy:dy/l*sp,r:4},{x:e.x,y:e.y+10,vx:dx/l*sp-45,vy:dy/l*sp,r:4})
+}
+function hitEnemy(e,s){
+ let d=s.d;
+ if(s.type==='s'){
+   let gain=has('tag')?1.5:1;
+   if(e.armor==='veil'&&!e.fract)gain*=.45;
+   if(e.fract&&has('fractTag'))gain*=2;
+   if(e.armor==='adaptive'){if(e.adapt==='skirmish')gain*=.45;e.adapt='skirmish'}
+   e.tag=Math.min(8,e.tag+gain);learn('tag','SKIRMISH fire builds TAG. GEAR detonates it.');
+ }else{
+   if(e.armor==='plate'&&!e.fract){d*=.5;fl('PLATE',e.x,e.y-20,'#d9c98c');learn('plate','Plate halves heavy GEAR damage until a GEAR Drive-release fractures it.')}
+   if(e.armor==='adaptive'){if(e.adapt==='gear')d*=.55;e.adapt='gear'}
+   if(e.tag>0){let tags=e.tag,bonus=Math.round(tags*4);d+=bonus;fl('DETONATE +'+bonus,e.x,e.y-28,'#ffd27b');if(has('refund'))S.fuel=Math.min(S.mfuel,S.fuel+tags*3);if(has('splash'))S.enemies.forEach(o=>{if(o!==e&&Math.hypot(o.x-e.x,o.y-e.y)<95){let splash=Math.max(1,Math.round(bonus*.35));o.hp-=splash;fl('ECHO -'+splash,o.x,o.y-20,'#ffd27b')}});if(has('refresh')&&tags>=6){e.fract=Math.max(e.fract,1.5);fl('FRACTURE HELD',e.x,e.y-40,'#c9a2ff')}e.tag=0;learn('detonate','GEAR shots cash out TAG as bonus damage.')}
+   if(e.fract&&has('fractPierce'))s.pierce=true;
+ }
+ if(s.echo&&s.type==='g'){e.fract=Math.max(e.fract,1.8);e.adapt=null;fl('DRIVE FRACTURE',e.x,e.y-40,'#c9a2ff');learn('fracture','A GEAR Drive-release fractures defenses and clears adaptive resistance.')}
+ if(e.fract&&has('fracture'))d*=1.25;
+ e.hp-=d;part(e.x,e.y,s.type==='s'?'#7fd7ff':'#ffb06a',6);fl('-'+Math.round(d),e.x,e.y-10);
+ if(e.hp<=0){S.chain++;S.score+=100+S.chain*10;part(e.x,e.y,'#f3d78a',18);tone(110,.08,.025);S.enemies.splice(S.enemies.indexOf(e),1)}
+}
+function burst(){
+ if(!S.run||busy)return;
+ if(S.drive>0){msg('DRIVE already active // keep grazing, then SHIFT to release the echoes.');tone(720,.05,.01);return}
+ let cost=has('cheap')?24:30;if(S.res<cost){msg('Need '+cost+' Resonance for DRIVE. Graze enemy fire.');tone(100,.08,.02);return}
+ S.res-=cost;S.drive=4.2;S.echoes=0;navigator.vibrate?.([18,26,18]);tone(95,.2,.045,'sawtooth');part(player.x,player.y,'#c9a2ff',28);msg('RESONANCE DRIVE // graze bullets into echoes. SHIFT before the timer dies.');learn('drive','During DRIVE, grazing captures enemy fire as echoes. SHIFT determines how the echoes are released.');hud()
+}
+function releaseDrive(targetMode){
+ if(S.drive<=0||S.echoes<=0){S.drive=0;S.echoes=0;return}
+ let n=S.echoes;
+ if(targetMode==='gear'){
+   let lanes=Math.min(9,3+Math.floor(n/2));for(let i=0;i<lanes;i++){let spread=(i-(lanes-1)/2)*22;S.shots.push({x:player.x,y:player.y-16,vx:spread,vy:-500,r:5,d:10+Math.floor(n*.8),type:'g',pierce:true,echo:true})}
+   fl('ECHO LANCE x'+lanes,player.x,player.y-35,'#ffcf8c');msg('DRIVE RELEASE // captured fire becomes a piercing GEAR volley.');tone(120,.2,.04,'sawtooth')
+ }else{
+   let targets=[...S.enemies].sort((a,b)=>Math.hypot(a.x-player.x,a.y-player.y)-Math.hypot(b.x-player.x,b.y-player.y));let pool=Math.max(1,n);targets.forEach((e,i)=>{let add=Math.max(1,Math.ceil((pool/(i+1))*.55));e.tag=Math.min(8,e.tag+add);fl('+TAG '+add,e.x,e.y-30,'#7fd7ff')});
+   for(let i=0;i<Math.min(18,n);i++){let a=Math.PI*2*i/Math.min(18,n);S.shots.push({x:player.x,y:player.y,vx:Math.cos(a)*180,vy:Math.sin(a)*180,r:3,d:4,type:'s',echo:true})}
+   msg('DRIVE RELEASE // captured fire blooms outward as TAG pressure.');tone(620,.14,.03,'triangle')
+ }
+ navigator.vibrate?.([12,18,28]);part(player.x,player.y,targetMode==='gear'?'#ffb06a':'#7fd7ff',26);S.drive=0;S.echoes=0
+}
+function shift(){
+ if(!S.run)return;
+ let next=S.mode==='skirmish'?'gear':'skirmish';if(S.drive>0&&S.echoes>0)releaseDrive(next);
+ if(S.mode==='skirmish'){S.mode='gear';msg('GEAR MODE // heavy cannon online. Fuel drains while firing.');tone(120,.14,.03,'sawtooth');navigator.vibrate?.(25)}
+ else{S.mode='skirmish';msg('SKIRMISH MODE // spread guns online. Build TAG.');tone(480,.08,.02)}
+ document.getElementById('shift').textContent=S.mode==='skirmish'?'SHIFT → GEAR':'SHIFT → SKIRMISH';document.getElementById('shift').classList.toggle('on',S.mode==='gear');hud()
+}
+function update(dt){
+ if(!S.run)return;
+ shootPlayer(dt);
+ S.spawnT-=dt;if(S.spawnT<=0&&!S.boss){S.spawnT=Math.max(.45,1.1-S.wave*.04);spawnEnemy(false)}
+ for(const e of [...S.enemies]){
+   e.y+=e.speed*dt;e.shot-=dt;e.fract=Math.max(0,e.fract-dt);
+   if(e.shot<=0&&e.y>40){e.shot=e.id==='archon'?.5:1.1+Math.random()*.8;enemyFire(e)}
+   if(e.y>H+30){S.enemies.splice(S.enemies.indexOf(e),1);damage(8)}
+ }
+ for(const s of [...S.shots]){s.x+=s.vx*dt;s.y+=s.vy*dt;if(s.y<-20){S.shots.splice(S.shots.indexOf(s),1);continue}
+   for(const e of [...S.enemies])if(Math.hypot(s.x-e.x,s.y-e.y)<e.r+s.r){hitEnemy(e,s);if(!s.pierce){S.shots.splice(S.shots.indexOf(s),1);break}}
+ }
+ for(const b of [...S.eshots]){
+   b.x+=b.vx*dt;b.y+=b.vy*dt;
+   if(b.x<-20||b.x>W+20||b.y>H+20){S.eshots.splice(S.eshots.indexOf(b),1);continue}
+   let d=Math.hypot(b.x-player.x,b.y-player.y),graze=has('graze')?34:29;
+   if(d<player.r+b.r){S.eshots.splice(S.eshots.indexOf(b),1);damage(10);continue}
+   if(d<graze&&!b.g){b.g=true;S.chain++;if(S.drive>0){S.echoes=Math.min(S.driveMax,S.echoes+1);S.eshots.splice(S.eshots.indexOf(b),1);part(b.x,b.y,'#c9a2ff',5);fl('ECHO '+S.echoes,player.x,player.y-32,'#c9a2ff');tone(840,.035,.008,'triangle');if(has('burstFuel'))S.fuel=Math.min(S.mfuel,S.fuel+1)}else{S.res=Math.min(100,S.res+4);part(b.x,b.y,'#7fd7ff',3);tone(720,.025,.006);if(has('graze')&&S.chain%8===0)S.hp=Math.min(S.mhp,S.hp+1);if(has('grazeTag')&&S.chain%3===0&&S.enemies.length){let n=S.enemies.reduce((a,e)=>Math.hypot(e.x-player.x,e.y-player.y)<Math.hypot(a.x-player.x,a.y-player.y)?e:a,S.enemies[0]);n.tag=Math.min(8,n.tag+1);fl('+TAG',n.x,n.y-30,'#7fd7ff')}learn('graze','Grazing bullets builds Resonance without taking damage.')}}
+ }
+ if(S.mode==='skirmish')S.fuel=Math.min(S.mfuel,S.fuel+10*dt);if(S.drive>0){S.drive=Math.max(0,S.drive-dt);if(S.drive===0){if(S.echoes){let fuel=Math.min(24,S.echoes*2),heal=Math.floor(S.echoes/4);S.fuel=Math.min(S.mfuel,S.fuel+fuel);S.hp=Math.min(S.mhp,S.hp+heal);fl('+'+fuel+' FUEL',player.x,player.y-32,'#e7ba67');if(heal)fl('+'+heal+' HULL',player.x,player.y-46,'#9ee0bb');msg('DRIVE COLLAPSE // unused echoes folded into Fuel'+(heal?' and Hull.':'.'))}S.echoes=0}}
+ if(S.score>0&&S.score>=S.wave*900&&!S.boss){S.boss=true;S.enemies=[];S.eshots=[];spawnEnemy(true);msg('PALE ARCHON // something in the machine recognizes it.')}
+ if(S.boss&&!S.enemies.some(e=>e.id==='archon')){S.boss=false;S.wave++;S.score=0;upgrade()}
+ hud()
+}
+function damage(n){if(player.inv>0)return;S.hp-=n;player.inv=.55;S.chain=0;part(player.x,player.y,'#ff8585',14);navigator.vibrate?.([20,20,15]);tone(75,.14,.04);if(S.hp<=0)lose()}
+function upgrade(){
+ S.run=false;let opts=mods.filter(m=>!S.mods.some(q=>q[2]===m[2])).sort(()=>Math.random()-.5).slice(0,3);
+ if(!opts.length){opts=[['Repair Lattice','Restore 35 Hull.','heal'],['Fuel Choir','Restore all Fuel and +10 max Fuel.','fuel'],['Resonance Seed','Start next wave with 50 Resonance.','res']]}
+ showModal('VEIL RELIC','The frame opens a chamber that was not there before.',opts.map(m=>[m[0],m[1],()=>{if(m[2]==='heal')S.hp=Math.min(S.mhp,S.hp+35);else if(m[2]==='fuel'){S.mfuel+=10;S.fuel=S.mfuel}else if(m[2]==='res')S.res=50;else S.mods.push(m);hideModal();S.run=true;msg('WAVE '+S.wave+' // the clouds are thinning.')}]),false)
+}
+function lose(){S.run=false;meta.best=Math.max(meta.best,S.wave);localStorage.setItem(SAVE,JSON.stringify(meta));showModal('FRAME DOWN','Lyra wakes to the same voice: “Again.”',[['RESTART','Codex knowledge persists.',()=>{hideModal();newRun()}]],false)}
+function hud(){document.getElementById('wave').textContent='WAVE '+S.wave;document.getElementById('hpT').textContent=Math.max(0,Math.ceil(S.hp))+'/'+S.mhp;document.getElementById('fuelT').textContent=Math.ceil(S.fuel)+'/'+S.mfuel;document.getElementById('resT').textContent=S.drive>0?('DRIVE '+S.echoes+'/'+S.driveMax):Math.floor(S.res);document.getElementById('chainT').textContent='x'+S.chain;document.getElementById('modeT').textContent=S.mode.toUpperCase();document.getElementById('hpF').style.width=100*clamp(S.hp/S.mhp,0,1)+'%';document.getElementById('fuelF').style.width=100*clamp(S.fuel/S.mfuel,0,1)+'%';document.getElementById('resF').style.width=(S.drive>0?100*(S.drive/4.2):S.res)+'%';document.getElementById('burst').classList.toggle('on',S.drive>0)}
+function draw(){
+ x.clearRect(0,0,W,H);
+ let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0e1730');g.addColorStop(.5,'#10172a');g.addColorStop(1,'#050711');x.fillStyle=g;x.fillRect(0,0,W,H);
+ for(let i=0;i<45;i++){let yy=(i*73+(performance.now()*.02))%H;x.fillStyle='rgba(190,210,255,.12)';x.fillRect((i*97)%W,yy,1,1)}
+ if(S.mode==='gear'){x.fillStyle='rgba(255,176,106,.05)';x.fillRect(0,0,W,H)}
+ for(const s of S.shots){x.fillStyle=s.type==='s'?'#7fd7ff':'#ffb06a';x.fillRect(s.x-s.r,s.y-8,s.r*2,12)}
+ for(const b of S.eshots){x.fillStyle=b.g?'#aee9ff':'#df89b9';x.beginPath();x.arc(b.x,b.y,b.r,0,7);x.fill()}if(S.drive>0&&S.echoes){let n=Math.min(S.echoes,18),time=performance.now()/420;for(let i=0;i<n;i++){let a=time+i*Math.PI*2/n,rr=28+(i%3)*5,ex=player.x+Math.cos(a)*rr,ey=player.y+Math.sin(a)*rr;x.fillStyle=i%2?'#c9a2ff':'#7fd7ff';x.beginPath();x.arc(ex,ey,3+(i%3===0),0,7);x.fill();x.strokeStyle='rgba(201,162,255,.16)';x.beginPath();x.moveTo(player.x,player.y);x.lineTo(ex,ey);x.stroke()}}
+ for(const e of S.enemies){
+   x.save();x.translate(e.x,e.y);x.fillStyle=e.id==='wisp'?'#b4c9df':e.id==='shell'?'#8b826d':e.id==='choir'?'#826c9d':'#d2c0a0';
+   if(e.id==='wisp'){x.fillRect(-13,-12,26,24);x.fillStyle='#7fd7ff';x.fillRect(-4,-4,8,8)}
+   else if(e.id==='shell'){x.fillRect(-18,-16,36,32);x.fillStyle=e.fract?'#4a3b38':'#d1bd8e';x.fillRect(-12,-22,24,8)}
+   else if(e.id==='choir'){for(let i=-1;i<=1;i++)x.fillRect(i*9-3,-18+Math.abs(i)*5,6,34)}
+   else{x.fillRect(-28,-34,56,66);x.fillStyle='#efe0ae';x.fillRect(-10,-44,20,12);x.fillStyle='#5f506a';x.fillRect(-36,-16,12,38);x.fillRect(24,-16,12,38)}
+   if(e.tag>0){x.strokeStyle='#7fd7ff';x.lineWidth=2;for(let i=0;i<Math.min(4,Math.ceil(e.tag));i++){x.beginPath();x.arc(0,0,e.r+7+i*3,-.4,.4);x.stroke()}}
+   if(e.fract){x.strokeStyle='#c9a2ff';x.beginPath();x.moveTo(-e.r,-e.r);x.lineTo(e.r,e.r);x.moveTo(e.r,-e.r);x.lineTo(-e.r,e.r);x.stroke()}
+   let ratio=clamp(e.hp/e.mhp,0,1);x.fillStyle='#080b12';x.fillRect(-e.r-5,-e.r-15,(e.r+5)*2,5);x.fillStyle=ratio<.3?'#e06c6c':'#d8c98a';x.fillRect(-e.r-5,-e.r-15,(e.r+5)*2*ratio,5);x.restore()
+ }
+ if(pointer.down){x.strokeStyle='rgba(180,210,240,.45)';x.lineWidth=1;x.beginPath();x.arc(pointer.x,pointer.y,10,0,Math.PI*2);x.stroke();x.beginPath();x.moveTo(pointer.x-14,pointer.y);x.lineTo(pointer.x+14,pointer.y);x.moveTo(pointer.x,pointer.y-14);x.lineTo(pointer.x,pointer.y+14);x.stroke();x.strokeStyle='rgba(127,215,255,.18)';x.beginPath();x.moveTo(pointer.x,pointer.y-8);x.lineTo(player.x,player.y+14);x.stroke()}
+ x.save();x.translate(player.x,player.y);if(player.inv>0&&Math.floor(player.inv*20)%2===0)x.globalAlpha=.35;
+ const mechPrimary=S.mode==='skirmish'?'#93a8c4':'#b79a72';
+ const mechSecondary=S.mode==='skirmish'?'#5f7397':'#6e573d';
+ const mechAccent=S.mode==='skirmish'?'#7fd7ff':'#ffb06a';
+ const mechTrim=S.mode==='skirmish'?'#dce8f7':'#ead7b5';
+ const bob=Math.sin(performance.now()*0.008)*1.5;x.translate(0,bob);
+ x.globalAlpha*=0.55;x.fillStyle='#05070d';x.beginPath();x.ellipse(0,20,18,6,0,0,Math.PI*2);x.fill();x.globalAlpha/=0.55;
+ x.fillStyle=mechSecondary;x.beginPath();x.moveTo(-20,-10);x.lineTo(-10,-18);x.lineTo(-8,-2);x.closePath();x.fill();x.beginPath();x.moveTo(20,-10);x.lineTo(10,-18);x.lineTo(8,-2);x.closePath();x.fill();
+ x.fillStyle=mechSecondary;x.fillRect(-12,6,8,14);x.fillRect(4,6,8,14);x.fillStyle=mechAccent;x.fillRect(-11,18,6,4);x.fillRect(5,18,6,4);
+ x.fillStyle=mechPrimary;x.fillRect(-10,-1,7,10);x.fillRect(3,-1,7,10);x.fillStyle=mechSecondary;x.fillRect(-7,-4,14,6);
+ x.fillStyle=mechPrimary;x.beginPath();x.moveTo(0,-24);x.lineTo(14,-14);x.lineTo(11,4);x.lineTo(0,10);x.lineTo(-11,4);x.lineTo(-14,-14);x.closePath();x.fill();
+ x.fillStyle=mechTrim;x.fillRect(-10,-14,20,7);x.fillStyle=mechAccent;x.fillRect(-3,-12,6,10);x.fillRect(-8,-4,5,4);x.fillRect(3,-4,5,4);
+ x.fillStyle=mechPrimary;x.fillRect(-18,-16,8,8);x.fillRect(10,-16,8,8);x.fillStyle=mechSecondary;x.fillRect(-18,-9,6,16);x.fillRect(12,-9,6,16);
+ if(S.mode==='gear'){x.fillStyle=mechPrimary;x.fillRect(14,-4,11,8);x.fillStyle=mechAccent;x.fillRect(22,-2,6,4)}else{x.fillStyle=mechAccent;x.fillRect(-17,5,4,6);x.fillRect(13,5,4,6)}
+ x.fillStyle=mechPrimary;x.fillRect(-6,-28,12,8);x.fillStyle=mechTrim;x.fillRect(-4,-30,8,4);x.fillStyle=mechAccent;x.fillRect(-4,-25,8,3);
+ x.fillStyle=mechTrim;x.fillRect(-11,9,6,4);x.fillRect(5,9,6,4);
+ if(S.mode==='skirmish'){x.strokeStyle='rgba(127,215,255,.65)';x.lineWidth=1.5;x.beginPath();x.moveTo(-15,-12);x.lineTo(-22,-3);x.moveTo(15,-12);x.lineTo(22,-3);x.stroke()}else{x.fillStyle='rgba(255,176,106,.55)';x.fillRect(-3,12,6,7);x.fillRect(-1,-20,2,5)}
+ x.restore();
+ player.inv=Math.max(0,player.inv-1/60);
+ for(const p of S.parts){p.t-=1/60;p.x+=p.vx/60;p.y+=p.vy/60;x.globalAlpha=clamp(p.t*2,0,1);x.fillStyle=p.c;x.fillRect(p.x,p.y,3,3)}S.parts=S.parts.filter(p=>p.t>0);
+ for(const f of S.floats){f.life-=1/60;f.py-=20/60;x.globalAlpha=clamp(f.life*2,0,1);x.fillStyle=f.c;x.font='bold 9px monospace';x.textAlign='center';x.fillText(f.t,f.px,f.py)}S.floats=S.floats.filter(f=>f.life>0);x.globalAlpha=1;x.textAlign='left';
+ requestAnimationFrame(draw)
+}
+requestAnimationFrame(draw);
+function loop(t){let dt=Math.min(.033,(t-last)/1000||.016);last=t;update(dt);requestAnimationFrame(loop)}requestAnimationFrame(loop);
+
+function showModal(title,sub,choices=[],closable=true){document.getElementById('mt').textContent=title;document.getElementById('ms').textContent=sub;let l=document.getElementById('ml');l.innerHTML='';choices.forEach(([n,d,fn])=>{let b=document.createElement('button');b.className='choice';b.innerHTML='<strong>'+n+'</strong><span>'+d+'</span>';b.onclick=fn;l.appendChild(b)});document.getElementById('close').style.display=closable?'block':'none';document.getElementById('modal').classList.add('on')}
+function hideModal(){document.getElementById('modal').classList.remove('on')}
+function codex(){let rows=enemies.map(e=>[e.name+' • '+e.armor.toUpperCase(),e.note,()=>{}]).concat(Object.entries(meta.codex).map(([k,v])=>[k.toUpperCase(),v,()=>{}]));showModal('VEIL CODEX','Knowledge the frame chose to keep.',rows,true)}
+function newRun(){S.wave=1;S.mode='skirmish';S.hp=S.mhp=100;S.fuel=S.mfuel=100;S.res=S.chain=S.score=0;S.drive=0;S.echoes=0;S.enemies=[];S.shots=[];S.eshots=[];S.parts=[];S.floats=[];S.mods=[];S.boss=false;S.spawnT=.5;player.x=W*.5;player.y=H*.8;S.run=true;hud();msg('SKIRMISH fire tags. GEAR fire detonates. Graze for Resonance.')}
+C.addEventListener('pointerdown',e=>{if(!S.run)return;pointer.down=true;let r=C.getBoundingClientRect();pointer.x=e.clientX-r.left;pointer.y=e.clientY-r.top;player.x=clamp(pointer.x,18,W-18);player.y=clamp(pointer.y-TOUCH_LEAD,55,H-25);try{C.setPointerCapture(e.pointerId)}catch(_){}},{passive:false});
+C.addEventListener('pointermove',e=>{if(!pointer.down||!S.run)return;e.preventDefault();let r=C.getBoundingClientRect();pointer.x=e.clientX-r.left;pointer.y=e.clientY-r.top;player.x=clamp(pointer.x,18,W-18);player.y=clamp(pointer.y-TOUCH_LEAD,55,H-25)},{passive:false});
+['pointerup','pointercancel','lostpointercapture'].forEach(t=>C.addEventListener(t,e=>{pointer.down=false},{passive:false}));
+document.getElementById('burst').onclick=burst;document.getElementById('shift').onclick=shift;document.getElementById('codex').onclick=codex;document.getElementById('close').onclick=hideModal;
+let booted=false;function boot(e){if(e){e.preventDefault();e.stopPropagation()}if(booted)return;booted=true;document.getElementById('start').style.display='none';bootAudio();newRun()}
+document.getElementById('boot').addEventListener('touchend',boot,{passive:false});document.getElementById('boot').addEventListener('click',boot,{passive:false});
+['contextmenu','selectstart','dragstart','gesturestart','gesturechange','gestureend','dblclick'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{capture:true,passive:false}));
+document.addEventListener('touchmove',e=>{if(e.target.closest('.card'))return;e.preventDefault()},{capture:true,passive:false});
+document.addEventListener('visibilitychange',()=>{if(audio){document.hidden?audio.suspend():audio.resume()}});
+hud();
+})();
+</script>
+</body>
+</html>
