@@ -21,3 +21,4 @@ jobs:
           git add games/wip/index.html
           git commit -m 'Replace WIP player with humanoid Gear v3 silhouette' || exit 0
           git push
+# trigger
