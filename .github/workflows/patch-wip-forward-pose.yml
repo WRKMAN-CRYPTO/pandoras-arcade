@@ -21,3 +21,4 @@ jobs:
           git add games/wip/index.html
           git commit -m 'Turn WIP Gear toward the fight' || exit 0
           git push
+# trigger
