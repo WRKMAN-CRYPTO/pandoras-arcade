@@ -7,34 +7,352 @@
 <meta name="theme-color" content="#080b12">
 <title>BLACKBOX//SAINT v2</title>
 <style>
-:root{--i:#eef6ff;--m:#91a3b7;--heat:#ff9b63;--pulse:#7fd7ff;--null:#c9a2ff;--t:max(10px,env(safe-area-inset-top));--b:max(10px,env(safe-area-inset-bottom))}
+:root{
+  --i:#eef6ff;--m:#91a3b7;--heat:#ff9b63;--pulse:#7fd7ff;--null:#c9a2ff;
+  --t:max(10px,env(safe-area-inset-top));--b:max(10px,env(safe-area-inset-bottom))
+}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:#05070b;color:var(--i);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-body{position:fixed;inset:0;touch-action:none}button{font:inherit;color:inherit;border:0;-webkit-appearance:none;appearance:none;touch-action:none}
-#app{position:fixed;inset:0;display:flex;flex-direction:column;background:radial-gradient(circle at 50% 0,#182139,#080b12 45%)}
-#top{padding:var(--t) 8px 6px;display:flex;gap:7px}.hud{flex:1;background:#101624e8;border:1px solid #2d3c55;border-radius:11px;padding:7px}.r{display:flex;justify-content:space-between;gap:6px;font-size:9px;line-height:1.45}.r b{font-size:10px}.bar{height:6px;background:#05070b;border-radius:9px;overflow:hidden;margin:3px 0}.f{height:100%;background:#e26969;transition:width .18s}.q{background:#78c9df}
-#arena{position:relative;flex:1;min-height:0;margin:0 8px;border:1px solid #26364f;border-radius:13px;overflow:hidden;background:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(#151d2d,#0a0e17);background-size:20px 20px,20px 20px,auto}canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges}
-#intent{position:absolute;left:7px;right:7px;top:7px;background:#05080de8;border:1px solid #32445f;border-radius:8px;padding:6px 8px;text-align:center;font-size:9px;font-weight:900;line-height:1.35}#log{position:absolute;left:7px;right:7px;bottom:7px;min-height:29px;background:#05080de8;border:1px solid #32445f;border-radius:8px;padding:6px;text-align:center;font-size:9px;line-height:1.35;color:#d5e0ea}#phase{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);font-weight:1000;font-size:18px;letter-spacing:.08em;text-shadow:0 2px 8px #000;opacity:0;pointer-events:none}#phase.on{animation:phase .38s ease-out}@keyframes phase{0%{opacity:0;transform:translate(-50%,-42%) scale(.84)}25%{opacity:1}100%{opacity:0;transform:translate(-50%,-58%) scale(1.06)}}
-#con{padding:7px 8px var(--b);display:flex;flex-direction:column;gap:6px;background:#090c13}#preview{min-height:28px;border:1px solid #263751;background:#0d131f;border-radius:9px;padding:5px 7px;font-size:8px;line-height:1.35;text-align:center;color:#c7d5e4}#rack{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.s{position:relative;min-height:82px;border-radius:11px;background:#111827;border:1px solid #35465f;padding:7px;text-align:center;overflow:hidden}.s .l{font-size:8px;color:#91a3b7}.s .c{font-size:12px;font-weight:1000;margin:5px 0}.s .e{font-size:8px;line-height:1.3}.s:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:var(--core)}.s.h{--core:var(--heat)}.s.p{--core:var(--pulse)}.s.n{--core:var(--null)}#route{display:grid;grid-template-columns:66px 1fr 66px;gap:6px}.btn{min-height:50px;border-radius:12px;background:linear-gradient(#26334a,#151d2b);border:1px solid #3a4d69;font-weight:1000;font-size:16px;box-shadow:inset 0 1px #ffffff12}.btn:active,.btn.on{transform:translateY(1px);filter:brightness(.86)}#go{font-size:11px;background:linear-gradient(#584171,#2e223d)}#go.busy{opacity:.55}#sub{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.mini{min-height:36px;border-radius:9px;background:#111827;border:1px solid #2e3d55;font-size:8px;font-weight:900}
-.modal{position:fixed;inset:0;z-index:20;background:#030508f2;display:none;align-items:center;justify-content:center;padding:calc(var(--t) + 8px) 12px calc(var(--b) + 8px);touch-action:pan-y}.modal.on{display:flex}.card{position:relative;width:min(94vw,560px);max-height:calc(100dvh - var(--t) - var(--b) - 24px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;background:#111827;border:1px solid #3a4d69;border-radius:15px;padding:14px 14px 70px}.card *{touch-action:pan-y}.card button{touch-action:manipulation}.closeTop{position:sticky;top:0;z-index:3;float:right;margin:-5px -5px 5px 8px;width:42px;height:42px;border-radius:10px;background:#28364d;border:1px solid #465a77;font-weight:1000}h1,h2{margin:0 0 8px}h1{font-size:20px}h2{font-size:16px}.small{font-size:10px;color:#9cacc0;line-height:1.5}.big,.choice{width:100%;padding:11px;border-radius:10px;background:#223049;border:1px solid #405675;margin-top:7px;text-align:left}.big{text-align:center;background:#49375e;font-weight:1000}.choice strong{display:block;font-size:10px}.choice span{display:block;font-size:9px;color:#a9b8c7;margin-top:3px;line-height:1.35}.legend{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}.legend div{padding:7px;background:#0a0f18;border-radius:8px;font-size:8px;line-height:1.4}.stickyBottom{position:sticky;bottom:-58px;margin:14px -14px -70px;padding:9px 14px calc(var(--b) + 7px);background:linear-gradient(transparent,#111827 20%);z-index:4}#start{display:flex}@media(min-width:700px){#app{max-width:620px;left:50%;transform:translateX(-50%);border-left:1px solid #1d293a;border-right:1px solid #1d293a}}
-</style></head><body>
-<div id="app"><div id="top"><div class="hud"><div class="r"><b>NERA VOSS</b><span id="node">NODE 1</span></div><div class="r"><span>Integrity</span><span id="hp"></span></div><div class="bar"><div class="f" id="hf"></div></div><div class="r"><span>Charge</span><span id="ch"></span></div><div class="bar"><div class="f q" id="cf"></div></div></div><div class="hud" style="max-width:138px"><div class="r"><span>Relics</span><b id="rc">0/5</b></div><div class="r"><span>Burn</span><b id="pb">0</b></div><div class="r"><span>Ward</span><b id="pw">0</b></div><div class="r"><span>Fault</span><b id="pf">0</b></div></div></div><div id="arena"><canvas id="g"></canvas><div id="intent"></div><div id="phase"></div><div id="log"></div></div><div id="con"><div id="preview"></div><div id="rack"><button class="s" data-i="0"><div class="l">BLADE</div><div class="c"></div><div class="e"></div></button><button class="s" data-i="1"><div class="l">WARD</div><div class="c"></div><div class="e"></div></button><button class="s" data-i="2"><div class="l">LENS</div><div class="c"></div><div class="e"></div></button></div><div id="route"><button class="btn" id="left">↶</button><button class="btn" id="go">COMMIT ROUTE</button><button class="btn" id="right">↷</button></div><div id="sub"><button class="mini" id="oc">OVERCLOCK</button><button class="mini" id="codex">CODEX</button><button class="mini" id="repair">REPAIR</button></div></div></div>
-<div class="modal on" id="start"><div class="card"><h1>BLACKBOX//SAINT</h1><div class="small">Courier Nera Voss wakes inside a dead war-machine with three surviving cores and one hostile instruction: <b>KEEP MOVING.</b><br><br>Rotate HEAT, PULSE, and NULL through Blade, Ward, and Lens. A route is not a loadout. It is a three-step action.</div><div class="legend"><div><b>ROUTE</b><br>Rotate all three cores.</div><div><b>COMMIT</b><br>Watch Blade → Ward → Lens resolve.</div><div><b>OVERCLOCK</b><br>Spend 10 Charge to double Lens.</div><div><b>PREDICT</b><br>The panel warns about known enemy interactions before you commit.</div></div><button class="big" id="boot">BOOT THE BLACKBOX</button></div></div>
-<div class="modal" id="modal"><div class="card" id="modalCard"><button class="closeTop" id="xClose" aria-label="close">×</button><h2 id="mt"></h2><div class="small" id="ms"></div><div id="ml"></div><div class="stickyBottom"><button class="big" id="close">RETURN</button></div></div></div>
-<script>(()=>{'use strict';const C=document.getElementById('g'),x=C.getContext('2d'),modal=document.getElementById('modal');let W=0,H=0,D=1,audio=null,music=null,busy=false,fx={heroX:0,enemyX:0,heroFlash:0,enemyFlash:0,ward:0,beam:null};const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),pick=a=>a[Math.floor(Math.random()*a.length)],sleep=ms=>new Promise(r=>setTimeout(r,ms));const cores=['Heat','Pulse','Null'],SAVE='blackboxSaintSaveV2';let meta=JSON.parse(localStorage.getItem(SAVE)||'{"codex":{},"best":0}');const S={run:false,node:1,rot:0,relics:[],oc:false,parts:[],floats:[]},P={hp:100,mhp:100,ch:30,mch:30,burn:0,ward:0,fault:0,tempo:0};let E;const foes=[{n:'Ash Hound',hp:62,p:11,t:'Heat-fed',note:'Burn makes BITE stronger unless Fault disrupts it.',pat:['BITE','BITE','HOWL']},{n:'Mirror Drone',hp:56,p:10,t:'Projectile',note:'PULSE→WARD reflects LANCE.',pat:['LANCE','SCAN','LANCE']},{n:'Casket Knight',hp:82,p:12,t:'Armored',note:'Armor halves Blade damage until Break exists.',pat:['BRACE','CLEAVE','CLEAVE']},{n:'Null Choir',hp:68,p:9,t:'Hex',note:'NULL→WARD can erase CHANT Fault.',pat:['CHANT','DRAIN','CHANT']},{n:'Saint-9',hp:126,p:14,t:'Adaptive',note:'Repeating a Blade core makes it adapt. Change the route.',pat:['JUDGMENT','SEAL','JUDGMENT','MIRROR']}];const relics=[['Ragged Fuse','Heat Lens also Burns the enemy','fuse'],['Mirror Capacitor','Pulse Ward reflects 9 damage from any damaging intent','mirror'],['Hollow Relay','Null Lens converts one of your Faults into 5 Charge','hollow'],['Copper Teeth','Blade gains +5 when target has Burn + Break','teeth'],['Saintwire','Overclock also strengthens Ward by 60%','saint']];
-function rs(){D=Math.min(devicePixelRatio||1,2);W=C.clientWidth;H=C.clientHeight;C.width=W*D;C.height=H*D;x.setTransform(D,0,0,D,0,0)}addEventListener('resize',rs);rs();function tone(f=330,d=.07,v=.025,type='square'){if(!audio)return;try{let o=audio.createOscillator(),g=audio.createGain(),n=audio.currentTime;o.type=type;o.frequency.value=f;g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(v,n+.008);g.gain.exponentialRampToValueAtTime(.0001,n+d);o.connect(g).connect(audio.destination);o.start();o.stop(n+d+.02)}catch(_){}}function startAudio(){if(audio)return;try{audio=new(window.AudioContext||window.webkitAudioContext)();let seq=[82,98,110,92,123,110],i=0;music=setInterval(()=>{if(S.run&&!document.hidden&&!modal.classList.contains('on'))tone(seq[i++%seq.length],.17,.007,'triangle')},390)}catch(_){}}function log(t){document.getElementById('log').textContent=t}function phase(t,c='#eef6ff'){let p=document.getElementById('phase');p.textContent=t;p.style.color=c;p.classList.remove('on');void p.offsetWidth;p.classList.add('on')}function learn(k,t){if(meta.codex[k])return;meta.codex[k]=t;localStorage.setItem(SAVE,JSON.stringify(meta));log('CODEX // '+t);tone(660,.1,.02,'triangle')}function has(r){return S.relics.some(q=>q[2]===r)}function core(i){return cores[(i+S.rot+3)%3]}function eff(i,c){return i===0?(c==='Heat'?'14 damage • +2 Burn':c==='Pulse'?'12 damage • +2 Break':'10 damage • +1 Fault'):i===1?(c==='Heat'?'+10 Ward • retaliate':c==='Pulse'?'+7 Ward • reflect shots':'+6 Ward • erase Fault'):(c==='Heat'?'+8 Charge • +Tempo':c==='Pulse'?'+Break • read intent':'Rewrite enemy status')}
-function knownWarning(){if(!E)return '';let a=core(0),w=core(1),l=core(2),arr=[];if(E.n==='Ash Hound'&&a==='Heat'&&E.fault<=0)arr.push('⚠ Burn empowers its BITE');if(E.n==='Mirror Drone'&&E.pat[E.turn%E.pat.length]==='LANCE'&&w==='Pulse')arr.push('✓ Pulse Ward will REFLECT LANCE');if(E.n==='Casket Knight'&&a!=='Pulse'&&E.brk<=0)arr.push('⚠ Armor will halve Blade damage');if(E.n==='Null Choir'&&E.pat[E.turn%E.pat.length]==='CHANT'&&w==='Null')arr.push('✓ Null Ward will erase CHANT');if(E.n==='Saint-9'&&E.res===a)arr.push('⚠ Saint-9 resists this Blade core');if(l==='Null'&&E.burn>0)arr.push('Null Lens: Burn → Fault');else if(l==='Null'&&E.brk>0)arr.push('Null Lens: Break → Burn');return arr.join(' • ')||'No known interaction warning.'}function rack(){document.querySelectorAll('.s').forEach((b,i)=>{let c=core(i);b.className='s '+c[0].toLowerCase();b.querySelector('.c').textContent=(c==='Heat'?'🔥 ':c==='Pulse'?'⚡ ':'◇ ')+c.toUpperCase();b.querySelector('.e').textContent=eff(i,c)});document.getElementById('preview').textContent=knownWarning();hud()}function rot(d){if(!S.run||busy)return;S.rot=(S.rot+d+3)%3;S.oc=false;rack();tone(d>0?330:277,.04);navigator.vibrate?.(8)}function spawn(){let z=S.node%5===0?foes[4]:pick(foes.slice(0,4));E={...z,hp:z.hp+S.node*3,mhp:z.hp+S.node*3,turn:0,burn:0,brk:0,fault:0,res:null,scan:0};fx.enemyX=32;log('NODE '+S.node+' // '+E.n+' enters from the far deck.');hud();rack()}function fl(t,px,py,c='#fff'){S.floats.push({t,px,py,c,life:.75})}function particles(px,py,c,n=8){for(let i=0;i<n;i++)S.parts.push({x:px,y:py,vx:(Math.random()-.5)*120,vy:(Math.random()-.5)*100,t:.45,c})}
-async function blade(c){phase('BLADE',c==='Heat'?'#ff9b63':c==='Pulse'?'#7fd7ff':'#c9a2ff');fx.heroX=18;fx.beam={from:'hero',to:'enemy',c,t:.22};tone(c==='Heat'?180:c==='Pulse'?440:260,.09,.035);await sleep(150);let d=c==='Heat'?14:c==='Pulse'?12:10;if(c==='Heat'){E.burn+=2;learn('heatBlade','HEAT→BLADE applies Burn.')}if(c==='Pulse'){E.brk+=2;learn('pulseBlade','PULSE→BLADE creates Break.')}if(c==='Null'){E.fault++;learn('nullBlade','NULL→BLADE adds Fault.')}if(E.n==='Casket Knight'&&!E.brk){d=Math.ceil(d*.5);fl('ARMORED',W*.7,H*.49,'#c8b98b')}if(E.n==='Saint-9'){if(E.res===c){d=Math.ceil(d*.45);fl('RESIST',W*.7,H*.49,'#c9a2ff')}E.res=c}if(has('teeth')&&E.burn>0&&E.brk>0){d+=5;fl('COPPER TEETH +5',W*.7,H*.43,'#ffd28f')}if(P.tempo){d+=P.tempo*2;P.tempo=0}E.hp-=d;fx.enemyX=-10;fx.enemyFlash=.2;particles(W*.7,H*.57,c==='Heat'?'#ff9b63':c==='Pulse'?'#7fd7ff':'#c9a2ff',12);fl('-'+d,W*.7,H*.5);navigator.vibrate?.(18);await sleep(190);fx.heroX=0;return d}
-async function ward(c){phase('WARD',c==='Heat'?'#ff9b63':c==='Pulse'?'#7fd7ff':'#c9a2ff');let q=0;if(c==='Heat'){q=10;P.ward+=q;P.burn=Math.max(1,P.burn);learn('heatWard','HEAT→WARD gives strong Ward and retaliation, but leaves Burn.')}if(c==='Pulse'){q=7;P.ward+=q;learn('pulseWard','PULSE→WARD reflects projectile intents.')}if(c==='Null'){q=6;P.ward+=q;if(P.fault){P.fault--;fl('FAULT ERASED',W*.3,H*.55,'#c9a2ff');learn('nullWard','NULL→WARD erases one Fault.')}}if(S.oc&&has('saint'))P.ward+=Math.ceil(q*.6);fx.ward=.45;tone(520,.08,.02,'triangle');fl('+'+P.ward+' WARD',W*.3,H*.5,c==='Heat'?'#ff9b63':c==='Pulse'?'#7fd7ff':'#c9a2ff');hud();await sleep(250)}
-async function lens(c){phase('LENS',c==='Heat'?'#ff9b63':c==='Pulse'?'#7fd7ff':'#c9a2ff');let m=S.oc?2:1;if(c==='Heat'){let gain=8*m;P.ch=Math.min(P.mch,P.ch+gain);P.tempo=Math.min(3,P.tempo+m);if(has('fuse')){E.burn+=m;fl('FUSE: +BURN',W*.7,H*.47,'#ff9b63')}fl('+'+gain+' CHARGE',W*.3,H*.48,'#7fd7ff');learn('heatLens','HEAT→LENS grants Charge and Tempo.')}if(c==='Pulse'){E.brk+=m;E.scan=1;fl('ANALYZED',W*.7,H*.47,'#7fd7ff');learn('pulseLens','PULSE→LENS reveals another intent and adds Break.')}if(c==='Null'){if(E.burn){let n=Math.min(m,E.burn);E.burn-=n;E.fault+=n;fl('BURN → FAULT',W*.7,H*.45,'#c9a2ff');particles(W*.7,H*.55,'#c9a2ff',14);learn('nullLens','NULL→LENS rewrites Burn into Fault.')}else if(E.brk){let n=Math.min(m,E.brk);E.brk-=n;E.burn+=n;fl('BREAK → BURN',W*.7,H*.45,'#ff9b63');learn('rewrite','NULL→LENS can rewrite Break into Burn.')}else{E.fault+=m;fl('+FAULT',W*.7,H*.47,'#c9a2ff')}if(has('hollow')&&P.fault){P.fault--;P.ch=Math.min(P.mch,P.ch+5);fl('FAULT → +5 CHARGE',W*.3,H*.46,'#7fd7ff')}}tone(c==='Heat'?300:c==='Pulse'?650:210,.11,.025,'triangle');hud();await sleep(260)}
-async function commit(){if(!S.run||!E||busy)return;busy=true;document.getElementById('go').classList.add('busy');let a=core(0),w=core(1),l=core(2),d=await blade(a);if(E.hp<=0){await win();return endBusy()}await ward(w);await lens(l);S.oc=false;log(a+' Blade dealt '+d+'. Enemy response incoming.');await sleep(170);await enemy(w);rack();endBusy()}function endBusy(){busy=false;document.getElementById('go').classList.remove('busy')}
-async function enemy(w){let i=E.pat[E.turn%E.pat.length];E.turn++;let d=E.p;phase(i,'#ffced1');fx.enemyX=-15;await sleep(120);if(i==='BRACE'){E.brk=Math.max(0,E.brk-1);E.hp=Math.min(E.mhp,E.hp+6);fl('+6 REPAIR',W*.7,H*.48,'#d9c796');log('BRACE // armor plates reseal.');return tick()}if(i==='HOWL'){P.fault++;P.ch=Math.max(0,P.ch-6);fl('+FAULT',W*.3,H*.48,'#c9a2ff');log('HOWL // +1 Fault, -6 Charge.');return tick()}if(i==='SCAN'){E.res=core(0);fl('BLADE CORE COPIED',W*.7,H*.47,'#c9a2ff');log('SCAN // current Blade core marked for resistance.');return tick()}if(i==='CHANT'){if(w==='Null'){fl('ERASED',W*.3,H*.48,'#c9a2ff');log('CHANT dissolved against the Null veil.');learn('chant','NULL Ward can erase hostile Fault.')}else{P.fault++;fl('+FAULT',W*.3,H*.48,'#c9a2ff');log('CHANT // +1 Fault.')}return tick()}if(i==='DRAIN'){let q=Math.min(8,P.ch);P.ch-=q;E.hp=Math.min(E.mhp,E.hp+q);fx.beam={from:'hero',to:'enemy',c:'Null',t:.28};fl('-'+q+' CHARGE',W*.3,H*.48,'#7fd7ff');log('DRAIN // '+q+' Charge stolen.');return tick()}if(i==='SEAL'){S.rot=(S.rot+1)%3;fl('ROUTE FORCED ↷',W*.5,H*.5,'#c9a2ff');log('SEAL // routing ring forced clockwise.');return tick()}if(i==='MIRROR'){E.res=core(0);E.brk=0;fl('ADAPT: '+E.res.toUpperCase(),W*.7,H*.47,'#c9a2ff');log('MIRROR // Blade core copied as resistance.');return tick()}if(i==='LANCE'&&w==='Pulse'){let r=has('mirror')?9:6;E.hp-=r;fx.beam={from:'enemy',to:'hero',c:'Pulse',t:.18};await sleep(100);fx.beam={from:'hero',to:'enemy',c:'Pulse',t:.2};fl('REFLECT '+r,W*.7,H*.48,'#7fd7ff');log('DEFLECT // LANCE reflected for '+r+'.');learn('reflect','PULSE Ward reflects projectile intents.');if(E.hp<=0)return win();return tick()}if(has('mirror')){E.hp-=9;fl('MIRROR CAP 9',W*.7,H*.47,'#7fd7ff')}if(i==='BITE'&&E.burn>0&&E.fault<=0){d+=5;learn('houndBurn','Ash Hound gains damage while Burning unless Fault disrupts it.')}if(i==='JUDGMENT'&&P.fault>0)d+=P.fault*2;fx.beam={from:'enemy',to:'hero',c:'Hit',t:.2};await sleep(120);let blocked=Math.min(P.ward,d);P.ward-=blocked;let hit=d-blocked;if(blocked){fx.ward=.35;fl('BLOCK '+blocked,W*.3,H*.48,'#7fd7ff');tone(180,.07,.03)}if(hit){P.hp-=hit;fx.heroX=12;fx.heroFlash=.2;fl('-'+hit,W*.3,H*.52,'#ff8d8d');particles(W*.3,H*.58,'#ff8d8d',10);navigator.vibrate?.([22,24,18]);tone(90,.12,.04)}if(w==='Heat'&&blocked>0){E.hp-=4;fl('RETALIATE 4',W*.7,H*.5,'#ff9b63')}log(i+' // '+hit+' damage'+(blocked?' • '+blocked+' blocked':'')+'.');await sleep(180);fx.heroX=0;return tick()}
-async function tick(){if(E.burn>0){E.hp-=4;E.burn--;fl('BURN -4',W*.7,H*.5,'#ff9b63');particles(W*.7,H*.57,'#ff9b63',6)}if(P.burn>0){P.hp-=2;P.burn--;fl('BURN -2',W*.3,H*.5,'#ff9b63')}E.brk=Math.max(0,E.brk-1);E.fault=Math.max(0,E.fault-1);E.scan=Math.max(0,E.scan-1);P.ch=Math.min(P.mch,P.ch+2);hud();if(E.hp<=0)return win();if(P.hp<=0)return lose();await sleep(80)}function oc(){if(!S.run||busy)return;if(S.oc){S.oc=false;log('Overclock cancelled.');rack();return}if(P.ch<10){log('Need 10 Charge to Overclock.');tone(120,.08,.025);return}P.ch-=10;S.oc=true;log('OVERCLOCK armed // Lens resolves twice.');fl('OVERCLOCK',W*.5,H*.55,'#c9a2ff');tone(520,.08,.03);rack()}
-async function win(){S.run=false;tone(660,.1,.03);setTimeout(()=>tone(880,.12,.025),80);fl('NODE CLEARED',W*.55,H*.42,'#eef6ff');await sleep(500);S.node++;meta.best=Math.max(meta.best,S.node);localStorage.setItem(SAVE,JSON.stringify(meta));P.ch=Math.min(P.mch,P.ch+8);if(S.node%3===0)relicChoice();else if(S.node%4===0)maintenance();else{S.run=true;spawn()}}function lose(){S.run=false;showModal('BLACKBOX REBOOT','The route failed. Codex knowledge remains.',[['RESTART NODE 1','Relics are lost. Knowledge persists.',()=>{hideModal();newRun()}]],false)}
-function relicChoice(){let opts=relics.filter(r=>!S.relics.some(x=>x[2]===r[2])).sort(()=>Math.random()-.5).slice(0,3);if(!opts.length){showModal('SALVAGE CACHE','Every unique relic is already installed. The blackbox strips this cache for useful material.',[['RECLAIM PLATING','Restore 28 Integrity.',()=>{P.hp=Math.min(P.mhp,P.hp+28);hideModal();S.run=true;spawn()}],['RECLAIM CAPACITORS','Restore all Charge and gain +1 Tempo.',()=>{P.ch=P.mch;P.tempo=Math.min(3,P.tempo+1);hideModal();S.run=true;spawn()}],['PURGE THE CACHE','Clear Burn and Fault, then restore 14 Integrity.',()=>{P.burn=P.fault=0;P.hp=Math.min(P.mhp,P.hp+14);hideModal();S.run=true;spawn()}]],false);return}showModal('SALVAGE RELIC','Choose a new rule to bolt into the blackbox.',opts.map(r=>[r[0],r[1],()=>{S.relics.push(r);hideModal();S.run=true;spawn();hud()}]),false)}
-function maintenance(){showModal('MAINTENANCE BAY','One adjustment before the next node.',[['PATCH SHELL','Restore 35 Integrity.',()=>{P.hp=Math.min(P.mhp,P.hp+35);hideModal();S.run=true;spawn()}],['EXPAND CAPACITOR','+6 max Charge and fill it.',()=>{P.mch+=6;P.ch=P.mch;hideModal();S.run=true;spawn()}],['PURGE FAULTS','Clear Burn/Fault and gain 1 Tempo.',()=>{P.burn=P.fault=0;P.tempo=Math.min(3,P.tempo+1);hideModal();S.run=true;spawn()}]],false)}function repair(){if(!S.run||busy)return;if(P.ch<12){log('Manual repair needs 12 Charge.');return}P.ch-=12;P.hp=Math.min(P.mhp,P.hp+12);fl('+12 REPAIR',W*.3,H*.48,'#9be3bd');log('FIELD REPAIR // +12 Integrity.');tone(240,.08,.025);hud()}
-function showModal(title,sub,choices=[],closable=true){document.getElementById('mt').textContent=title;document.getElementById('ms').textContent=sub;let l=document.getElementById('ml');l.innerHTML='';for(const [n,d,fn] of choices){let b=document.createElement('button');b.className='choice';b.innerHTML='<strong>'+n+'</strong><span>'+d+'</span>';if(fn&&fn.toString()!=='()=>{}')b.onclick=fn;l.appendChild(b)}document.getElementById('close').style.display=closable?'block':'none';document.getElementById('xClose').style.display=closable?'block':'none';modal.classList.add('on');document.getElementById('modalCard').scrollTop=0}function hideModal(){modal.classList.remove('on')}function codex(){let choices=foes.map(e=>[e.n+' • '+e.t,e.note,()=>{}]);choices=choices.concat(Object.entries(meta.codex).map(([k,v])=>[k.toUpperCase(),v,()=>{}]));showModal('BLACKBOX CODEX','Recorded after proof, not rumor.',choices,true)}function newRun(){S.node=1;S.rot=0;S.relics=[];S.oc=false;S.parts=[];S.floats=[];P.hp=P.mhp=100;P.ch=P.mch=30;P.burn=P.ward=P.fault=P.tempo=0;S.run=true;spawn();rack()}
-function hud(){document.getElementById('node').textContent='NODE '+S.node;document.getElementById('hp').textContent=Math.max(0,Math.ceil(P.hp))+'/'+P.mhp;document.getElementById('ch').textContent=Math.ceil(P.ch)+'/'+P.mch;document.getElementById('hf').style.width=100*clamp(P.hp/P.mhp,0,1)+'%';document.getElementById('cf').style.width=100*clamp(P.ch/P.mch,0,1)+'%';document.getElementById('rc').textContent=S.relics.length+'/'+relics.length;document.getElementById('pb').textContent=P.burn;document.getElementById('pw').textContent=P.ward;document.getElementById('pf').textContent=P.fault;if(E){let next=E.pat[E.turn%E.pat.length],extra=E.scan?' • THEN '+E.pat[(E.turn+1)%E.pat.length]:'';document.getElementById('intent').textContent=E.n+' // INTENT: '+next+extra+' // Burn '+E.burn+' • Break '+E.brk+' • Fault '+E.fault}document.getElementById('oc').textContent=S.oc?'OVERCLOCK ✓':'OVERCLOCK'}
-function drawEnemyGauge(ex,ey){if(!E)return;let seg=8,w=76,h=7,gap=2,ratio=clamp(E.hp/E.mhp,0,1),filled=Math.ceil(ratio*seg),sx=ex-w/2;x.fillStyle='#070a10';x.fillRect(sx-4,ey-84,w+8,19);x.strokeStyle='#4b5b70';x.strokeRect(sx-4+.5,ey-84+.5,w+7,18);for(let i=0;i<seg;i++){x.fillStyle=i<filled?(ratio<.3?'#df6b67':'#d7c98a'):'#232a34';x.fillRect(sx+i*(w/seg),ey-76,w/seg-gap,h)}x.fillStyle='#b8c7d7';x.font='bold 8px monospace';x.textAlign='center';x.fillText(E.n,ex,ey-87)}
-function draw(){x.clearRect(0,0,W,H);let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#151e2f');g.addColorStop(1,'#090d15');x.fillStyle=g;x.fillRect(0,0,W,H);const px=W*.28+fx.heroX,py=H*.73,ex=W*.71+fx.enemyX,ey=H*.59;x.fillStyle='#070a0f88';x.beginPath();x.ellipse(px,py+18,36,9,0,0,7);x.fill();x.beginPath();x.ellipse(ex,ey+24,43,11,0,0,7);x.fill();if(fx.ward>0){x.strokeStyle='rgba(127,215,255,'+clamp(fx.ward*2,0,1)+')';x.lineWidth=3;x.beginPath();x.arc(px,py-22,38,0,7);x.stroke();fx.ward-=1/60}x.fillStyle=fx.heroFlash>0?'#f5f7fb':'#596d91';x.fillRect(px-13,py-45,26,45);x.fillStyle='#bdccd9';x.fillRect(px-8,py-59,16,15);x.fillStyle='#283b54';x.fillRect(px-22,py-34,9,29);x.fillStyle='#d4ad62';x.fillRect(px+10,py-29,20,4);if(P.burn>0){x.fillStyle='#ff9b63';x.fillRect(px-17,py-4,5,8);x.fillRect(px+12,py-8,4,10)}if(fx.heroFlash>0)fx.heroFlash-=1/60;if(E){drawEnemyGauge(ex,ey);let col=E.n==='Ash Hound'?'#b85f45':E.n==='Mirror Drone'?'#6b8ca8':E.n==='Casket Knight'?'#77705d':E.n==='Null Choir'?'#786197':'#8b719d';x.fillStyle=fx.enemyFlash>0?'#f7f4ef':col;if(E.n==='Ash Hound'){x.fillRect(ex-30,ey-25,48,28);x.fillRect(ex+12,ey-38,24,20);x.fillRect(ex-24,ey,8,26);x.fillRect(ex+10,ey,8,26)}else if(E.n==='Mirror Drone'){x.fillRect(ex-28,ey-28,56,44);x.fillStyle='#b9d8eb';x.fillRect(ex-8,ey-17,16,12)}else if(E.n==='Casket Knight'){x.fillRect(ex-26,ey-54,52,60);x.fillStyle=E.brk?'#473f35':'#b5a77d';x.fillRect(ex-14,ey-67,28,16);if(E.brk){x.strokeStyle='#ffcf7a';x.beginPath();x.moveTo(ex-16,ey-45);x.lineTo(ex+16,ey-16);x.stroke()}}else if(E.n==='Null Choir'){for(let i=0;i<3;i++)x.fillRect(ex-32+i*23,ey-46-(i%2)*7,18,48)}else{x.fillRect(ex-30,ey-62,60,68);x.fillStyle='#d7c48d';x.fillRect(ex-16,ey-76,32,17);if(E.res){x.fillStyle=E.res==='Heat'?'#ff9b63':E.res==='Pulse'?'#7fd7ff':'#c9a2ff';x.fillRect(ex-5,ey-45,10,10)}}if(E.burn>0){x.fillStyle='#ff9b63';for(let i=0;i<Math.min(3,E.burn);i++)x.fillRect(ex-25+i*15,ey+2-(i%2)*6,5,10)}if(E.fault>0){x.strokeStyle='#c9a2ff';for(let i=0;i<Math.min(3,E.fault);i++)x.strokeRect(ex-30+i*20,ey-54,9,9)}if(fx.enemyFlash>0)fx.enemyFlash-=1/60}if(fx.beam){fx.beam.t-=1/60;let a=fx.beam.from==='hero'?[px+20,py-28]:[ex-20,ey-25],b=fx.beam.to==='enemy'?[ex-18,ey-25]:[px+18,py-28];x.strokeStyle=fx.beam.c==='Heat'?'#ff9b63':fx.beam.c==='Pulse'?'#7fd7ff':fx.beam.c==='Null'?'#c9a2ff':'#ff8d8d';x.lineWidth=3;x.beginPath();x.moveTo(a[0],a[1]);x.lineTo(b[0],b[1]);x.stroke();if(fx.beam.t<=0)fx.beam=null}for(const p of S.parts){p.t-=1/60;p.x+=p.vx/60;p.y+=p.vy/60;x.globalAlpha=clamp(p.t*2,0,1);x.fillStyle=p.c;x.fillRect(p.x,p.y,4,4)}S.parts=S.parts.filter(p=>p.t>0);for(const f of S.floats){f.life-=1/60;f.py-=18/60;x.globalAlpha=clamp(f.life*2,0,1);x.fillStyle=f.c;x.font='bold 10px monospace';x.textAlign='center';x.fillText(f.t,f.px,f.py)}S.floats=S.floats.filter(f=>f.life>0);x.globalAlpha=1;x.textAlign='left';fx.enemyX*=.78;fx.heroX*=.78;requestAnimationFrame(draw)}requestAnimationFrame(draw);
-function bind(id,fn){const el=document.getElementById(id);let down=false;const on=e=>{e.preventDefault();e.stopPropagation();if(down)return;down=true;el.classList.add('on');fn();try{if(e.pointerId!=null)el.setPointerCapture(e.pointerId)}catch(_){}};const off=e=>{if(e){e.preventDefault();e.stopPropagation()}down=false;el.classList.remove('on')};el.addEventListener('pointerdown',on,{passive:false});el.addEventListener('pointerup',off,{passive:false});el.addEventListener('pointercancel',off,{passive:false});el.addEventListener('lostpointercapture',off,{passive:false})}bind('left',()=>rot(-1));bind('right',()=>rot(1));bind('go',commit);bind('oc',oc);bind('repair',repair);document.getElementById('codex').addEventListener('pointerup',e=>{e.preventDefault();if(!busy)codex()},{passive:false});document.getElementById('close').onclick=hideModal;document.getElementById('xClose').onclick=hideModal;let booted=false;function boot(e){if(e){e.preventDefault();e.stopPropagation()}if(booted)return;booted=true;document.getElementById('start').classList.remove('on');document.getElementById('start').style.display='none';startAudio();newRun();log('BLACKBOX ONLINE // choose a route, then watch what it actually does.')}document.getElementById('boot').addEventListener('touchend',boot,{passive:false});document.getElementById('boot').addEventListener('click',boot,{passive:false});['contextmenu','selectstart','dragstart','gesturestart','gesturechange','gestureend','dblclick'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{capture:true,passive:false}));document.addEventListener('touchmove',e=>{if(e.target.closest('.card'))return;e.preventDefault()},{capture:true,passive:false});document.addEventListener('visibilitychange',()=>{if(audio){document.hidden?audio.suspend():audio.resume()}});rack();hud()})();</script></body></html>
+body{position:fixed;inset:0;touch-action:none}
+button{font:inherit;color:inherit;border:0;-webkit-appearance:none;appearance:none;touch-action:none}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;background:radial-gradient(circle at 50% 0,#182139,#080b12 45%)}#app.oc{animation:ocPulse .72s ease-in-out infinite alternate}#app.oc #con{box-shadow:inset 0 0 28px #7c58a833}#app.oc #preview{border-color:#9d7bd0;box-shadow:0 0 12px #9d7bd044;color:#f1e6ff}@keyframes ocPulse{from{filter:none}to{filter:brightness(1.08)}}
+#top{padding:var(--t) 8px 6px;display:flex;gap:7px}
+.hud{flex:1;background:#101624e8;border:1px solid #2d3c55;border-radius:11px;padding:7px}
+.r{display:flex;justify-content:space-between;gap:6px;font-size:9px;line-height:1.45}.r b{font-size:10px}
+.bar{height:6px;background:#05070b;border-radius:9px;overflow:hidden;margin:3px 0}.f{height:100%;background:#e26969;transition:width .18s}.q{background:#78c9df}
+#arena{position:relative;flex:1;min-height:0;margin:0 8px;border:1px solid #26364f;border-radius:13px;overflow:hidden;background:
+linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px),
+linear-gradient(#151d2d,#0a0e17);background-size:20px 20px,20px 20px,auto}
+canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges}
+#intent{position:absolute;left:7px;right:7px;top:7px;background:#05080de8;border:1px solid #32445f;border-radius:8px;padding:6px 8px;text-align:center;font-size:9px;font-weight:900;line-height:1.35}
+#log{position:absolute;left:7px;right:7px;bottom:7px;min-height:29px;background:#05080de8;border:1px solid #32445f;border-radius:8px;padding:6px;text-align:center;font-size:9px;line-height:1.35;color:#d5e0ea}
+#phase{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);font-weight:1000;font-size:18px;letter-spacing:.08em;text-shadow:0 2px 8px #000;opacity:0;pointer-events:none}
+#phase.on{animation:phase .38s ease-out}
+@keyframes phase{0%{opacity:0;transform:translate(-50%,-42%) scale(.84)}25%{opacity:1}100%{opacity:0;transform:translate(-50%,-58%) scale(1.06)}}
+#con{padding:7px 8px var(--b);display:flex;flex-direction:column;gap:6px;background:#090c13}
+#preview{min-height:28px;border:1px solid #263751;background:#0d131f;border-radius:9px;padding:5px 7px;font-size:8px;line-height:1.35;text-align:center;color:#c7d5e4}
+#rack{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.s{position:relative;min-height:82px;border-radius:11px;background:#111827;border:1px solid #35465f;padding:7px;text-align:center;overflow:hidden}
+.s .l{font-size:8px;color:#91a3b7}.s .c{font-size:12px;font-weight:1000;margin:5px 0}.s .e{font-size:8px;line-height:1.3}
+.s:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:var(--core)}
+.s.h{--core:var(--heat)}.s.p{--core:var(--pulse)}.s.n{--core:var(--null)}
+#route{display:grid;grid-template-columns:66px 1fr 66px;gap:6px}
+.btn{min-height:50px;border-radius:12px;background:linear-gradient(#26334a,#151d2b);border:1px solid #3a4d69;font-weight:1000;font-size:16px;box-shadow:inset 0 1px #ffffff12}
+.btn:active,.btn.on{transform:translateY(1px);filter:brightness(.86)}
+#go{font-size:11px;background:linear-gradient(#584171,#2e223d)}
+#go.busy{opacity:.55}
+#sub{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.mini{min-height:36px;border-radius:9px;background:#111827;border:1px solid #2e3d55;font-size:8px;font-weight:900}
+.modal{position:fixed;inset:0;z-index:20;background:#030508f2;display:none;align-items:center;justify-content:center;padding:calc(var(--t) + 8px) 12px calc(var(--b) + 8px);touch-action:pan-y}
+.modal.on{display:flex}
+.card{position:relative;width:min(94vw,560px);max-height:calc(100dvh - var(--t) - var(--b) - 24px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;background:#111827;border:1px solid #3a4d69;border-radius:15px;padding:14px 14px 70px}
+.card *{touch-action:pan-y}
+.card button{touch-action:manipulation}
+.closeTop{position:sticky;top:0;z-index:3;float:right;margin:-5px -5px 5px 8px;width:42px;height:42px;border-radius:10px;background:#28364d;border:1px solid #465a77;font-weight:1000}
+h1,h2{margin:0 0 8px}h1{font-size:20px}h2{font-size:16px}
+.small{font-size:10px;color:#9cacc0;line-height:1.5}
+.big,.choice{width:100%;padding:11px;border-radius:10px;background:#223049;border:1px solid #405675;margin-top:7px;text-align:left}
+.big{text-align:center;background:#49375e;font-weight:1000}.choice strong{display:block;font-size:10px}.choice span{display:block;font-size:9px;color:#a9b8c7;margin-top:3px;line-height:1.35}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}.legend div{padding:7px;background:#0a0f18;border-radius:8px;font-size:8px;line-height:1.4}
+.stickyBottom{position:sticky;bottom:-58px;margin:14px -14px -70px;padding:9px 14px calc(var(--b) + 7px);background:linear-gradient(transparent,#111827 20%);z-index:4}
+#start{display:flex}
+@media(min-width:700px){#app{max-width:620px;left:50%;transform:translateX(-50%);border-left:1px solid #1d293a;border-right:1px solid #1d293a}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="top">
+    <div class="hud">
+      <div class="r"><b>NERA VOSS</b><span id="node">NODE 1</span></div>
+      <div class="r"><span>Integrity</span><span id="hp"></span></div><div class="bar"><div class="f" id="hf"></div></div>
+      <div class="r"><span>Charge</span><span id="ch"></span></div><div class="bar"><div class="f q" id="cf"></div></div>
+    </div>
+    <div class="hud" style="max-width:138px">
+      <div class="r"><span>Relics</span><b id="rc">0/5</b></div>
+      <div class="r"><span>Burn</span><b id="pb">0</b></div>
+      <div class="r"><span>Ward</span><b id="pw">0</b></div>
+      <div class="r"><span>Fault</span><b id="pf">0</b></div>
+    </div>
+  </div>
+  <div id="arena">
+    <canvas id="g"></canvas>
+    <div id="intent"></div><div id="phase"></div><div id="log"></div>
+  </div>
+  <div id="con">
+    <div id="preview"></div>
+    <div id="rack">
+      <button class="s" data-i="0"><div class="l">BLADE</div><div class="c"></div><div class="e"></div></button>
+      <button class="s" data-i="1"><div class="l">WARD</div><div class="c"></div><div class="e"></div></button>
+      <button class="s" data-i="2"><div class="l">LENS</div><div class="c"></div><div class="e"></div></button>
+    </div>
+    <div id="route"><button class="btn" id="left">↶</button><button class="btn" id="go">COMMIT ROUTE</button><button class="btn" id="right">↷</button></div>
+    <div id="sub"><button class="mini" id="oc">OVERCLOCK</button><button class="mini" id="codex">CODEX</button><button class="mini" id="repair">REPAIR</button></div>
+  </div>
+</div>
+
+<div class="modal on" id="start"><div class="card">
+  <h1>BLACKBOX//SAINT</h1>
+  <div class="small">Courier Nera Voss wakes inside a dead war-machine with three surviving cores and one hostile instruction: <b>KEEP MOVING.</b><br><br>Rotate HEAT, PULSE, and NULL through Blade, Ward, and Lens. A route is not a loadout. It is a three-step action.</div>
+  <div class="legend"><div><b>ROUTE</b><br>Rotate all three cores.</div><div><b>COMMIT</b><br>Watch Blade → Ward → Lens resolve.</div><div><b>OVERCLOCK</b><br>Spend 10 Charge to unlock a unique overloaded Lens effect.</div><div><b>PREDICT</b><br>The panel warns about known enemy interactions before you commit.</div></div>
+  <button class="big" id="boot">BOOT THE BLACKBOX</button>
+</div></div>
+
+<div class="modal" id="modal"><div class="card" id="modalCard">
+  <button class="closeTop" id="xClose" aria-label="close">×</button>
+  <h2 id="mt"></h2><div class="small" id="ms"></div><div id="ml"></div>
+  <div class="stickyBottom"><button class="big" id="close">RETURN</button></div>
+</div></div>
+
+<script>
+(()=>{
+'use strict';
+const C=document.getElementById('g'),x=C.getContext('2d'),modal=document.getElementById('modal');
+let W=0,H=0,D=1,audio=null,music=null,busy=false,fx={heroX:0,enemyX:0,heroFlash:0,enemyFlash:0,ward:0,beam:null};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),pick=a=>a[Math.floor(Math.random()*a.length)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const cores=['Heat','Pulse','Null'],SAVE='blackboxSaintSaveV2';
+let meta=JSON.parse(localStorage.getItem(SAVE)||'{"codex":{},"best":0}');
+const S={run:false,node:1,rot:0,relics:[],oc:false,parts:[],floats:[]};
+const P={hp:100,mhp:100,ch:30,mch:30,burn:0,ward:0,fault:0,tempo:0};let E;
+const foes=[
+ {n:'Ash Hound',hp:62,p:11,t:'Heat-fed',note:'Burn makes BITE stronger unless Fault disrupts it.',pat:['BITE','BITE','HOWL']},
+ {n:'Mirror Drone',hp:56,p:10,t:'Projectile',note:'PULSE→WARD reflects LANCE.',pat:['LANCE','SCAN','LANCE']},
+ {n:'Casket Knight',hp:82,p:12,t:'Armored',note:'Armor halves Blade damage until Break exists.',pat:['BRACE','CLEAVE','CLEAVE']},
+ {n:'Null Choir',hp:68,p:9,t:'Hex',note:'NULL→WARD can erase CHANT Fault.',pat:['CHANT','DRAIN','CHANT']},
+ {n:'Saint-9',hp:126,p:14,t:'Adaptive',note:'Repeating a Blade core makes it adapt. Change the route.',pat:['JUDGMENT','SEAL','JUDGMENT','MIRROR']}
+];
+const relics=[
+ ['Ragged Fuse','Heat Lens also Burns the enemy','fuse'],
+ ['Mirror Capacitor','Pulse Ward reflects 9 damage from any damaging intent','mirror'],
+ ['Hollow Relay','Null Lens converts one of your Faults into 5 Charge','hollow'],
+ ['Copper Teeth','Blade gains +5 when target has Burn + Break','teeth'],
+ ['Saintwire','Overclock also strengthens Ward by 60%','saint']
+];
+function rs(){D=Math.min(devicePixelRatio||1,2);W=C.clientWidth;H=C.clientHeight;C.width=W*D;C.height=H*D;x.setTransform(D,0,0,D,0,0)}
+addEventListener('resize',rs);rs();
+function tone(f=330,d=.07,v=.025,type='square'){if(!audio)return;try{let o=audio.createOscillator(),g=audio.createGain(),n=audio.currentTime;o.type=type;o.frequency.value=f;g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(v,n+.008);g.gain.exponentialRampToValueAtTime(.0001,n+d);o.connect(g).connect(audio.destination);o.start();o.stop(n+d+.02)}catch(_){}}
+function startAudio(){if(audio)return;try{audio=new(window.AudioContext||window.webkitAudioContext)();let seq=[82,98,110,92,123,110],i=0;music=setInterval(()=>{if(S.run&&!document.hidden&&!modal.classList.contains('on'))tone(seq[i++%seq.length],.17,.007,'triangle')},390)}catch(_){}}
+function log(t){document.getElementById('log').textContent=t}
+function phase(t,c='#eef6ff'){let p=document.getElementById('phase');p.textContent=t;p.style.color=c;p.classList.remove('on');void p.offsetWidth;p.classList.add('on')}
+function learn(k,t){if(meta.codex[k])return;meta.codex[k]=t;localStorage.setItem(SAVE,JSON.stringify(meta));log('CODEX // '+t);tone(660,.1,.02,'triangle')}
+function has(r){return S.relics.some(q=>q[2]===r)}
+function core(i){return cores[(i+S.rot+3)%3]}
+function eff(i,c){
+ return i===0?(c==='Heat'?'14 damage • +2 Burn':c==='Pulse'?'12 damage • +2 Break':'10 damage • +1 Fault'):
+ i===1?(c==='Heat'?'+10 Ward • retaliate':' '+(c==='Pulse'?'+7 Ward • reflect shots':'+6 Ward • erase Fault')):
+ c==='Heat'?'+8 Charge • +Tempo':c==='Pulse'?'+Break • read intent':'Rewrite enemy status';
+}
+function ocLensText(){
+ let l=core(2);
+ if(!S.oc)return '';
+ if(l==='Heat')return 'OVERCLOCK HEAT LENS: +16 Charge • +2 Tempo • vent 6 damage';
+ if(l==='Pulse')return 'OVERCLOCK PULSE LENS: +3 Break • reveal next 2 intents';
+ if(E&&E.burn>0)return 'OVERCLOCK NULL LENS: convert ALL Burn → Fault';
+ if(E&&E.brk>0)return 'OVERCLOCK NULL LENS: convert ALL Break → Burn';
+ return 'OVERCLOCK NULL LENS: +3 Fault';
+}
+function knownWarning(){
+ if(!E)return '';
+ let a=core(0),w=core(1),l=core(2),arr=[];
+ if(S.oc)arr.push('⚡ '+ocLensText());
+ if(E.n==='Ash Hound'&&a==='Heat'&&E.fault<=0)arr.push('⚠ Burn empowers its BITE');
+ if(E.n==='Mirror Drone'&&E.pat[E.turn%E.pat.length]==='LANCE'&&w==='Pulse')arr.push('✓ Pulse Ward will REFLECT LANCE');
+ if(E.n==='Casket Knight'&&a!=='Pulse'&&E.brk<=0)arr.push('⚠ Armor will halve Blade damage');
+ if(E.n==='Null Choir'&&E.pat[E.turn%E.pat.length]==='CHANT'&&w==='Null')arr.push('✓ Null Ward will erase CHANT');
+ if(E.n==='Saint-9'&&E.res===a)arr.push('⚠ Saint-9 resists this Blade core');
+ if(l==='Null'&&!S.oc&&E.burn>0)arr.push('Null Lens: Burn → Fault');
+ else if(l==='Null'&&!S.oc&&E.brk>0)arr.push('Null Lens: Break → Burn');
+ return arr.join(' • ')||'No known interaction warning.';
+}
+function rack(){
+ document.getElementById('app').classList.toggle('oc',S.oc);
+ document.querySelectorAll('.s').forEach((b,i)=>{let c=core(i);b.className='s '+c[0].toLowerCase();b.querySelector('.c').textContent=(c==='Heat'?'🔥 ':c==='Pulse'?'⚡ ':'◇ ')+c.toUpperCase();b.querySelector('.e').textContent=(S.oc&&i===2?ocLensText():eff(i,c))});
+ document.getElementById('preview').textContent=knownWarning();hud();
+}
+function rot(d){if(!S.run||busy)return;S.rot=(S.rot+d+3)%3;S.oc=false;rack();tone(d>0?330:277,.04);navigator.vibrate?.(8)}
+function spawn(){let z=S.node%5===0?foes[4]:pick(foes.slice(0,4));E={...z,hp:z.hp+S.node*3,mhp:z.hp+S.node*3,turn:0,burn:0,brk:0,fault:0,res:null,scan:0};fx.enemyX=32;log('NODE '+S.node+' // '+E.n+' enters from the far deck.');hud();rack()}
+function fl(t,px,py,c='#fff'){S.floats.push({t,px,py,c,life:.75})}
+function particles(px,py,c,n=8){for(let i=0;i<n;i++)S.parts.push({x:px,y:py,vx:(Math.random()-.5)*120,vy:(Math.random()-.5)*100,t:.45,c})}
+async function blade(c){
+ phase('BLADE',c==='Heat'?'#ff9b63':c==='Pulse'?'#7fd7ff':'#c9a2ff');fx.heroX=18;fx.beam={from:'hero',to:'enemy',c,t:.22};tone(c==='Heat'?180:c==='Pulse'?440:260,.09,.035);
+ await sleep(150);
+ let d=c==='Heat'?14:c==='Pulse'?12:10;
+ if(c==='Heat'){E.burn+=2;learn('heatBlade','HEAT→BLADE applies Burn.')}
+ if(c==='Pulse'){E.brk+=2;learn('pulseBlade','PULSE→BLADE creates Break.')}
+ if(c==='Null'){E.fault++;learn('nullBlade','NULL→BLADE adds Fault.')}
+ if(E.n==='Casket Knight'&&!E.brk){d=Math.ceil(d*.5);fl('ARMORED',W*.7,H*.49,'#c8b98b')}
+ if(E.n==='Saint-9'){if(E.res===c){d=Math.ceil(d*.45);fl('RESIST',W*.7,H*.49,'#c9a2ff')}E.res=c}
+ if(has('teeth')&&E.burn>0&&E.brk>0){d+=5;fl('COPPER TEETH +5',W*.7,H*.43,'#ffd28f')}
+ if(P.tempo){d+=P.tempo*2;P.tempo=0}
+ E.hp-=d;fx.enemyX=-10;fx.enemyFlash=.2;particles(W*.7,H*.57,c==='Heat'?'#ff9b63':c==='Pulse'?'#7fd7ff':'#c9a2ff',12);fl('-'+d,W*.7,H*.5);
+ navigator.vibrate?.(18);await sleep(190);fx.heroX=0;
+ return d;
+}
+async function ward(c){
+ phase('WARD',c==='Heat'?'#ff9b63':c==='Pulse'?'#7fd7ff':'#c9a2ff');let q=0;
+ if(c==='Heat'){q=10;P.ward+=q;P.burn=Math.max(1,P.burn);learn('heatWard','HEAT→WARD gives strong Ward and retaliation, but leaves Burn.')}
+ if(c==='Pulse'){q=7;P.ward+=q;learn('pulseWard','PULSE→WARD reflects projectile intents.')}
+ if(c==='Null'){q=6;P.ward+=q;if(P.fault){P.fault--;fl('FAULT ERASED',W*.3,H*.55,'#c9a2ff');learn('nullWard','NULL→WARD erases one Fault.')}}
+ if(S.oc&&has('saint'))P.ward+=Math.ceil(q*.6);
+ fx.ward=.45;tone(520,.08,.02,'triangle');fl('+'+P.ward+' WARD',W*.3,H*.5,c==='Heat'?'#ff9b63':c==='Pulse'?'#7fd7ff':'#c9a2ff');hud();await sleep(250);
+}
+async function lens(c){
+ let over=S.oc;
+ phase(over?'OVERCLOCK LENS':'LENS',c==='Heat'?'#ff9b63':c==='Pulse'?'#7fd7ff':'#c9a2ff');
+ if(over){particles(W*.5,H*.62,'#c9a2ff',20);tone(150,.05,.035,'sawtooth');setTimeout(()=>tone(720,.14,.03,'triangle'),45);navigator.vibrate?.([14,18,28]);}
+ if(c==='Heat'){
+   let gain=over?16:8,tempo=over?2:1;
+   P.ch=Math.min(P.mch,P.ch+gain);P.tempo=Math.min(3,P.tempo+tempo);
+   if(has('fuse')){E.burn+=over?2:1;fl('FUSE: +BURN',W*.7,H*.47,'#ff9b63')}
+   if(over){E.hp-=6;fx.enemyFlash=.16;particles(W*.7,H*.56,'#ff9b63',14);fl('VENT -6',W*.7,H*.44,'#ff9b63');learn('ocHeat','OVERCLOCK HEAT LENS vents excess energy into damage while supercharging Charge and Tempo.')}
+   fl('+'+gain+' CHARGE',W*.3,H*.48,'#7fd7ff');learn('heatLens','HEAT→LENS grants Charge and Tempo.');
+ }
+ if(c==='Pulse'){
+   let br=over?3:1;E.brk+=br;E.scan=over?2:1;fl(over?'DEEP ANALYSIS +3 BREAK':'ANALYZED',W*.7,H*.47,'#7fd7ff');
+   if(over)learn('ocPulse','OVERCLOCK PULSE LENS deep-scans two future intents and applies heavy Break.');
+   learn('pulseLens','PULSE→LENS reveals another intent and adds Break.');
+ }
+ if(c==='Null'){
+   if(over&&E.burn>0){let n=E.burn;E.burn=0;E.fault+=n;fl('ALL BURN → FAULT',W*.7,H*.45,'#c9a2ff');particles(W*.7,H*.55,'#c9a2ff',22);learn('ocNull','OVERCLOCK NULL LENS rewrites every stack of the current convertible status.')}
+   else if(over&&E.brk>0){let n=E.brk;E.brk=0;E.burn+=n;fl('ALL BREAK → BURN',W*.7,H*.45,'#ff9b63');particles(W*.7,H*.55,'#ff9b63',22);learn('ocNull','OVERCLOCK NULL LENS rewrites every stack of the current convertible status.')}
+   else if(over){E.fault+=3;fl('+3 FAULT',W*.7,H*.47,'#c9a2ff');learn('ocNull','OVERCLOCK NULL LENS rewrites every stack of the current convertible status, or inflicts 3 Fault if none exist.')}
+   else if(E.burn){E.burn--;E.fault++;fl('BURN → FAULT',W*.7,H*.45,'#c9a2ff');particles(W*.7,H*.55,'#c9a2ff',14);learn('nullLens','NULL→LENS rewrites Burn into Fault.')}
+   else if(E.brk){E.brk--;E.burn++;fl('BREAK → BURN',W*.7,H*.45,'#ff9b63');learn('rewrite','NULL→LENS can rewrite Break into Burn.')}
+   else {E.fault++;fl('+FAULT',W*.7,H*.47,'#c9a2ff')}
+   if(has('hollow')&&P.fault){P.fault--;P.ch=Math.min(P.mch,P.ch+5);fl('FAULT → +5 CHARGE',W*.3,H*.46,'#7fd7ff')}
+ }
+ tone(c==='Heat'?300:c==='Pulse'?650:210,over?.18:.11,over?.035:.025,'triangle');hud();await sleep(over?390:260);
+}
+async function commit(){
+ if(!S.run||!E||busy)return;busy=true;document.getElementById('go').classList.add('busy');
+ let a=core(0),w=core(1),l=core(2),d=await blade(a);if(E.hp<=0){await win();return endBusy()}
+ await ward(w);await lens(l);S.oc=false;rack();log(a+' Blade dealt '+d+'. Enemy response incoming.');await sleep(170);await enemy(w);rack();endBusy()
+}
+function endBusy(){busy=false;document.getElementById('go').classList.remove('busy')}
+async function enemy(w){
+ let i=E.pat[E.turn%E.pat.length];E.turn++;let d=E.p;phase(i,'#ffced1');fx.enemyX=-15;await sleep(120);
+ if(i==='BRACE'){E.brk=Math.max(0,E.brk-1);E.hp=Math.min(E.mhp,E.hp+6);fl('+6 REPAIR',W*.7,H*.48,'#d9c796');log('BRACE // armor plates reseal.');return tick()}
+ if(i==='HOWL'){P.fault++;P.ch=Math.max(0,P.ch-6);fl('+FAULT',W*.3,H*.48,'#c9a2ff');log('HOWL // +1 Fault, -6 Charge.');return tick()}
+ if(i==='SCAN'){E.res=core(0);fl('BLADE CORE COPIED',W*.7,H*.47,'#c9a2ff');log('SCAN // current Blade core marked for resistance.');return tick()}
+ if(i==='CHANT'){if(w==='Null'){fl('ERASED',W*.3,H*.48,'#c9a2ff');log('CHANT dissolved against the Null veil.');learn('chant','NULL Ward can erase hostile Fault.')}else{P.fault++;fl('+FAULT',W*.3,H*.48,'#c9a2ff');log('CHANT // +1 Fault.')}return tick()}
+ if(i==='DRAIN'){let q=Math.min(8,P.ch);P.ch-=q;E.hp=Math.min(E.mhp,E.hp+q);fx.beam={from:'hero',to:'enemy',c:'Null',t:.28};fl('-'+q+' CHARGE',W*.3,H*.48,'#7fd7ff');log('DRAIN // '+q+' Charge stolen.');return tick()}
+ if(i==='SEAL'){S.rot=(S.rot+1)%3;fl('ROUTE FORCED ↷',W*.5,H*.5,'#c9a2ff');log('SEAL // routing ring forced clockwise.');return tick()}
+ if(i==='MIRROR'){E.res=core(0);E.brk=0;fl('ADAPT: '+E.res.toUpperCase(),W*.7,H*.47,'#c9a2ff');log('MIRROR // Blade core copied as resistance.');return tick()}
+ if(i==='LANCE'&&w==='Pulse'){let r=has('mirror')?9:6;E.hp-=r;fx.beam={from:'enemy',to:'hero',c:'Pulse',t:.18};await sleep(100);fx.beam={from:'hero',to:'enemy',c:'Pulse',t:.2};fl('REFLECT '+r,W*.7,H*.48,'#7fd7ff');log('DEFLECT // LANCE reflected for '+r+'.');learn('reflect','PULSE Ward reflects projectile intents.');if(E.hp<=0)return win();return tick()}
+ if(has('mirror')){E.hp-=9;fl('MIRROR CAP 9',W*.7,H*.47,'#7fd7ff')}
+ if(i==='BITE'&&E.burn>0&&E.fault<=0){d+=5;learn('houndBurn','Ash Hound gains damage while Burning unless Fault disrupts it.')}
+ if(i==='JUDGMENT'&&P.fault>0)d+=P.fault*2;
+ fx.beam={from:'enemy',to:'hero',c:'Hit',t:.2};await sleep(120);
+ let blocked=Math.min(P.ward,d);P.ward-=blocked;let hit=d-blocked;
+ if(blocked){fx.ward=.35;fl('BLOCK '+blocked,W*.3,H*.48,'#7fd7ff');tone(180,.07,.03)}
+ if(hit){P.hp-=hit;fx.heroX=12;fx.heroFlash=.2;fl('-'+hit,W*.3,H*.52,'#ff8d8d');particles(W*.3,H*.58,'#ff8d8d',10);navigator.vibrate?.([22,24,18]);tone(90,.12,.04)}
+ if(w==='Heat'&&blocked>0){E.hp-=4;fl('RETALIATE 4',W*.7,H*.5,'#ff9b63')}
+ log(i+' // '+hit+' damage'+(blocked?' • '+blocked+' blocked':'')+'.');await sleep(180);fx.heroX=0;return tick()
+}
+async function tick(){
+ if(E.burn>0){E.hp-=4;E.burn--;fl('BURN -4',W*.7,H*.5,'#ff9b63');particles(W*.7,H*.57,'#ff9b63',6)}
+ if(P.burn>0){P.hp-=2;P.burn--;fl('BURN -2',W*.3,H*.5,'#ff9b63')}
+ E.brk=Math.max(0,E.brk-1);E.fault=Math.max(0,E.fault-1);E.scan=Math.max(0,E.scan-1);P.ch=Math.min(P.mch,P.ch+2);hud();
+ if(E.hp<=0)return win();if(P.hp<=0)return lose();await sleep(80)
+}
+function oc(){if(!S.run||busy)return;if(S.oc){S.oc=false;log('Overclock cancelled. Charge is not refunded.');rack();return}if(P.ch<10){log('Need 10 Charge to Overclock.');tone(120,.08,.025);return}P.ch-=10;S.oc=true;phase('OVERCLOCK ARMED','#c9a2ff');fl('CORE LIMITERS OPEN',W*.5,H*.55,'#c9a2ff');particles(W*.5,H*.62,'#c9a2ff',18);tone(120,.07,.03,'sawtooth');setTimeout(()=>tone(520,.12,.03,'triangle'),65);navigator.vibrate?.([12,18,12]);log(ocLensText());rack()}
+async function win(){
+ S.run=false;tone(660,.1,.03);setTimeout(()=>tone(880,.12,.025),80);fl('NODE CLEARED',W*.55,H*.42,'#eef6ff');await sleep(500);
+ S.node++;meta.best=Math.max(meta.best,S.node);localStorage.setItem(SAVE,JSON.stringify(meta));P.ch=Math.min(P.mch,P.ch+8);
+ if(S.node%3===0)relicChoice();else if(S.node%4===0)maintenance();else{S.run=true;spawn()}
+}
+function lose(){S.run=false;showModal('BLACKBOX REBOOT','The route failed. Codex knowledge remains.',[['RESTART NODE 1','Relics are lost. Knowledge persists.',()=>{hideModal();newRun()}]],false)}
+function relicChoice(){
+ let opts=relics.filter(r=>!S.relics.some(x=>x[2]===r[2])).sort(()=>Math.random()-.5).slice(0,3);
+ if(!opts.length){
+   showModal('SALVAGE CACHE','Every unique relic is already installed. The blackbox strips this cache for useful material.',[
+    ['RECLAIM PLATING','Restore 28 Integrity.',()=>{P.hp=Math.min(P.mhp,P.hp+28);hideModal();S.run=true;spawn()}],
+    ['RECLAIM CAPACITORS','Restore all Charge and gain +1 Tempo.',()=>{P.ch=P.mch;P.tempo=Math.min(3,P.tempo+1);hideModal();S.run=true;spawn()}],
+    ['PURGE THE CACHE','Clear Burn and Fault, then restore 14 Integrity.',()=>{P.burn=P.fault=0;P.hp=Math.min(P.mhp,P.hp+14);hideModal();S.run=true;spawn()}]
+   ],false);return;
+ }
+ showModal('SALVAGE RELIC','Choose a new rule to bolt into the blackbox.',opts.map(r=>[r[0],r[1],()=>{S.relics.push(r);hideModal();S.run=true;spawn();hud()}]),false)
+}
+function maintenance(){showModal('MAINTENANCE BAY','One adjustment before the next node.',[
+ ['PATCH SHELL','Restore 35 Integrity.',()=>{P.hp=Math.min(P.mhp,P.hp+35);hideModal();S.run=true;spawn()}],
+ ['EXPAND CAPACITOR','+6 max Charge and fill it.',()=>{P.mch+=6;P.ch=P.mch;hideModal();S.run=true;spawn()}],
+ ['PURGE FAULTS','Clear Burn/Fault and gain 1 Tempo.',()=>{P.burn=P.fault=0;P.tempo=Math.min(3,P.tempo+1);hideModal();S.run=true;spawn()}]
+],false)}
+function repair(){if(!S.run||busy)return;if(P.ch<12){log('Manual repair needs 12 Charge.');return}P.ch-=12;P.hp=Math.min(P.mhp,P.hp+12);fl('+12 REPAIR',W*.3,H*.48,'#9be3bd');log('FIELD REPAIR // +12 Integrity.');tone(240,.08,.025);hud()}
+function showModal(title,sub,choices=[],closable=true){
+ document.getElementById('mt').textContent=title;document.getElementById('ms').textContent=sub;let l=document.getElementById('ml');l.innerHTML='';
+ for(const [n,d,fn] of choices){let b=document.createElement('button');b.className='choice';b.innerHTML='<strong>'+n+'</strong><span>'+d+'</span>';b.onclick=fn;l.appendChild(b)}
+ document.getElementById('close').style.display=closable?'block':'none';document.getElementById('xClose').style.display=closable?'block':'none';
+ modal.classList.add('on');document.getElementById('modalCard').scrollTop=0;
+}
+function hideModal(){modal.classList.remove('on')}
+function codex(){
+ let choices=foes.map(e=>[e.n+' • '+e.t,e.note,()=>{}]);
+ choices=choices.concat(Object.entries(meta.codex).map(([k,v])=>[k.toUpperCase(),v,()=>{}]));
+ showModal('BLACKBOX CODEX','Recorded after proof, not rumor.',choices,true);
+}
+function newRun(){S.node=1;S.rot=0;S.relics=[];S.oc=false;S.parts=[];S.floats=[];P.hp=P.mhp=100;P.ch=P.mch=30;P.burn=P.ward=P.fault=P.tempo=0;S.run=true;spawn();rack()}
+function hud(){
+ document.getElementById('node').textContent='NODE '+S.node;document.getElementById('hp').textContent=Math.max(0,Math.ceil(P.hp))+'/'+P.mhp;document.getElementById('ch').textContent=Math.ceil(P.ch)+'/'+P.mch;
+ document.getElementById('hf').style.width=100*clamp(P.hp/P.mhp,0,1)+'%';document.getElementById('cf').style.width=100*clamp(P.ch/P.mch,0,1)+'%';
+ document.getElementById('rc').textContent=S.relics.length+'/'+relics.length;document.getElementById('pb').textContent=P.burn;document.getElementById('pw').textContent=P.ward;document.getElementById('pf').textContent=P.fault;
+ if(E){let next=E.pat[E.turn%E.pat.length],extra=E.scan?' • THEN '+E.pat[(E.turn+1)%E.pat.length]:'';document.getElementById('intent').textContent=E.n+' // INTENT: '+next+extra+' // Burn '+E.burn+' • Break '+E.brk+' • Fault '+E.fault}
+ document.getElementById('oc').textContent=S.oc?'OVERCLOCK ✓':'OVERCLOCK';
+}
+function enemyGaugeY(ey){
+ if(!E)return ey-84;
+ let clearance=E.n==='Saint-9'?118:E.n==='Casket Knight'?108:E.n==='Null Choir'?96:E.n==='Mirror Drone'?78:72;
+ return Math.max(32,ey-clearance);
+}
+function drawEnemyGauge(ex,ey){
+ if(!E)return;let gy=enemyGaugeY(ey),seg=8,w=E.n==='Saint-9'?92:76,h=7,gap=2,ratio=clamp(E.hp/E.mhp,0,1),filled=Math.ceil(ratio*seg),sx=ex-w/2;
+ x.fillStyle='#070a10e8';x.fillRect(sx-4,gy-2,w+8,21);x.strokeStyle='#4b5b70';x.strokeRect(sx-4+.5,gy-1.5,w+7,20);
+ for(let i=0;i<seg;i++){x.fillStyle=i<filled?(ratio<.3?'#df6b67':'#d7c98a'):'#232a34';x.fillRect(sx+i*(w/seg),gy+8,w/seg-gap,h)}
+ x.fillStyle='#b8c7d7';x.font='bold 8px monospace';x.textAlign='center';x.fillText(E.n,ex,gy+6);
+}
+function draw(){
+ x.clearRect(0,0,W,H);let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#151e2f');g.addColorStop(1,'#090d15');x.fillStyle=g;x.fillRect(0,0,W,H);
+ const px=W*.28+fx.heroX,py=H*.73,ex=W*.71+fx.enemyX,ey=H*.59;
+ x.fillStyle='#070a0f88';x.beginPath();x.ellipse(px,py+18,36,9,0,0,7);x.fill();x.beginPath();x.ellipse(ex,ey+24,43,11,0,0,7);x.fill();
+ if(fx.ward>0){x.strokeStyle='rgba(127,215,255,'+clamp(fx.ward*2,0,1)+')';x.lineWidth=3;x.beginPath();x.arc(px,py-22,38,0,7);x.stroke();fx.ward-=1/60}
+ x.fillStyle=fx.heroFlash>0?'#f5f7fb':'#596d91';x.fillRect(px-13,py-45,26,45);x.fillStyle='#bdccd9';x.fillRect(px-8,py-59,16,15);x.fillStyle='#283b54';x.fillRect(px-22,py-34,9,29);x.fillStyle='#d4ad62';x.fillRect(px+10,py-29,20,4);
+ if(P.burn>0){x.fillStyle='#ff9b63';x.fillRect(px-17,py-4,5,8);x.fillRect(px+12,py-8,4,10)}
+ if(fx.heroFlash>0)fx.heroFlash-=1/60;
+ if(E){
+   drawEnemyGauge(ex,ey);
+   let col=E.n==='Ash Hound'?'#b85f45':E.n==='Mirror Drone'?'#6b8ca8':E.n==='Casket Knight'?'#77705d':E.n==='Null Choir'?'#786197':'#8b719d';
+   x.fillStyle=fx.enemyFlash>0?'#f7f4ef':col;
+   if(E.n==='Ash Hound'){x.fillRect(ex-30,ey-25,48,28);x.fillRect(ex+12,ey-38,24,20);x.fillRect(ex-24,ey,8,26);x.fillRect(ex+10,ey,8,26)}
+   else if(E.n==='Mirror Drone'){x.fillRect(ex-28,ey-28,56,44);x.fillStyle='#b9d8eb';x.fillRect(ex-8,ey-17,16,12)}
+   else if(E.n==='Casket Knight'){x.fillRect(ex-26,ey-54,52,60);x.fillStyle=E.brk?'#473f35':'#b5a77d';x.fillRect(ex-14,ey-67,28,16);if(E.brk){x.strokeStyle='#ffcf7a';x.beginPath();x.moveTo(ex-16,ey-45);x.lineTo(ex+16,ey-16);x.stroke()}}
+   else if(E.n==='Null Choir'){for(let i=0;i<3;i++)x.fillRect(ex-32+i*23,ey-46-(i%2)*7,18,48)}
+   else{x.fillRect(ex-30,ey-62,60,68);x.fillStyle='#d7c48d';x.fillRect(ex-16,ey-76,32,17);if(E.res){x.fillStyle=E.res==='Heat'?'#ff9b63':E.res==='Pulse'?'#7fd7ff':'#c9a2ff';x.fillRect(ex-5,ey-45,10,10)}}
+   if(E.burn>0){x.fillStyle='#ff9b63';for(let i=0;i<Math.min(3,E.burn);i++)x.fillRect(ex-25+i*15,ey+2-(i%2)*6,5,10)}
+   if(E.fault>0){x.strokeStyle='#c9a2ff';for(let i=0;i<Math.min(3,E.fault);i++){x.strokeRect(ex-30+i*20,ey-54,9,9)}}
+   if(fx.enemyFlash>0)fx.enemyFlash-=1/60;
+ }
+ if(fx.beam){
+   fx.beam.t-=1/60;let a=fx.beam.from==='hero'?[px+20,py-28]:[ex-20,ey-25],b=fx.beam.to==='enemy'?[ex-18,ey-25]:[px+18,py-28];
+   x.strokeStyle=fx.beam.c==='Heat'?'#ff9b63':fx.beam.c==='Pulse'?'#7fd7ff':fx.beam.c==='Null'?'#c9a2ff':'#ff8d8d';x.lineWidth=3;x.beginPath();x.moveTo(a[0],a[1]);x.lineTo(b[0],b[1]);x.stroke();if(fx.beam.t<=0)fx.beam=null;
+ }
+ for(const p of S.parts){p.t-=1/60;p.x+=p.vx/60;p.y+=p.vy/60;x.globalAlpha=clamp(p.t*2,0,1);x.fillStyle=p.c;x.fillRect(p.x,p.y,4,4)}
+ S.parts=S.parts.filter(p=>p.t>0);
+ for(const f of S.floats){f.life-=1/60;f.py-=18/60;x.globalAlpha=clamp(f.life*2,0,1);x.fillStyle=f.c;x.font='bold 10px monospace';x.textAlign='center';x.fillText(f.t,f.px,f.py)}
+ S.floats=S.floats.filter(f=>f.life>0);x.globalAlpha=1;x.textAlign='left';fx.enemyX*=.78;fx.heroX*=.78;
+ requestAnimationFrame(draw)
+}
+requestAnimationFrame(draw);
+
+function bind(id,fn){const el=document.getElementById(id);let down=false;const on=e=>{e.preventDefault();e.stopPropagation();if(down)return;down=true;el.classList.add('on');fn();try{if(e.pointerId!=null)el.setPointerCapture(e.pointerId)}catch(_){}};const off=e=>{if(e){e.preventDefault();e.stopPropagation()}down=false;el.classList.remove('on')};el.addEventListener('pointerdown',on,{passive:false});el.addEventListener('pointerup',off,{passive:false});el.addEventListener('pointercancel',off,{passive:false});el.addEventListener('lostpointercapture',off,{passive:false})}
+bind('left',()=>rot(-1));bind('right',()=>rot(1));bind('go',commit);bind('oc',oc);bind('repair',repair);
+document.getElementById('codex').addEventListener('pointerup',e=>{e.preventDefault();if(!busy)codex()},{passive:false});
+document.getElementById('close').onclick=hideModal;document.getElementById('xClose').onclick=hideModal;
+let booted=false;function boot(e){if(e){e.preventDefault();e.stopPropagation()}if(booted)return;booted=true;document.getElementById('start').classList.remove('on');document.getElementById('start').style.display='none';startAudio();newRun();log('BLACKBOX ONLINE // choose a route, then watch what it actually does.')}
+document.getElementById('boot').addEventListener('touchend',boot,{passive:false});document.getElementById('boot').addEventListener('click',boot,{passive:false});
+['contextmenu','selectstart','dragstart','gesturestart','gesturechange','gestureend','dblclick'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{capture:true,passive:false}));
+document.addEventListener('touchmove',e=>{if(e.target.closest('.card'))return;e.preventDefault()},{capture:true,passive:false});
+document.addEventListener('visibilitychange',()=>{if(audio){document.hidden?audio.suspend():audio.resume()}});
+rack();hud();
+})();
+</script>
+</body>
+</html>
