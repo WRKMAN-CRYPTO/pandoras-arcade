@@ -1,0 +1,28 @@
+name: Publish GRID BREAKER boss waves
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-grid-breaker-boss-waves.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Rebuild WIP from staged chunks
+        run: |
+          cat .deploy/bosswave_chunk_0.txt .deploy/bosswave_chunk_1.txt .deploy/bosswave_chunk_2.txt .deploy/bosswave_chunk_3.txt .deploy/bosswave_chunk_4.txt | base64 -d > games/wip/index.html
+          grep -q "BOSS WAVE 1/2" games/wip/index.html
+          grep -q "bossWaveIndices" games/wip/index.html
+          grep -q "FIRST WARD BROKEN" games/wip/index.html
+          grep -q "COMBINE // STRIKE" games/wip/index.html
+      - name: Commit boss wave build
+        run: |
+          git config user.name 'pandoras-arcade-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add games/wip/index.html
+          git commit -m 'Rework GRID BREAKER bosses into combat waves' || exit 0
+          git push
