@@ -26,3 +26,4 @@ jobs:
           git add index.html games/grid-breaker/index.html
           git commit -m 'Graduate GRID BREAKER to permanent cabinet' || exit 0
           git push
+# trigger
