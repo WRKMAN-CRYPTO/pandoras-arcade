@@ -24,3 +24,4 @@ jobs:
           git add games/wip/index.html
           git commit -m 'Center equations in GRID BREAKER answer tiles' || exit 0
           git push
+# trigger
