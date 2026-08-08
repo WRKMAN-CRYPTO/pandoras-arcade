@@ -1,1 +1,525 @@
-<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><title>The Hollow Constellation</title><style>*{box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#100d18;color:#f6f0ff;font:13px system-ui}#a{position:fixed;inset:0;display:flex;flex-direction:column;background:linear-gradient(#1c1528,#11101a)}#h{display:flex;justify-content:space-between;padding:max(9px,env(safe-area-inset-top)) 9px 4px}.p{background:#211a30dd;border:1px solid #ffffff1c;border-radius:10px;padding:7px}.b{height:6px;background:#08070c;border-radius:9px;overflow:hidden}.f{height:100%;background:#df6a73}.q{background:#8f79d6}canvas{flex:1;width:100%;min-height:0}.ess,.act{display:flex;gap:6px;padding:4px 8px}.ess button,.act button{flex:1;color:#fff;background:#241b34;border:1px solid #ffffff20;border-radius:10px;font-weight:900;min-height:42px}.ess .s{outline:2px solid #f0d27a;background:#3c2c54}.act button{min-height:56px}.n{text-align:center;min-height:18px;color:#cfc4dc;font-size:11px;padding:2px 6px}#log{position:absolute;left:8px;right:8px;top:72px;text-align:center;color:#fff;background:#0b0911aa;border-radius:8px;padding:5px;font-size:11px;pointer-events:none}.modal{position:fixed;inset:0;background:#08060ddd;display:none;align-items:center;justify-content:center;padding:14px;z-index:5}.modal.on{display:flex}.card{background:#211a30;border:1px solid #ffffff20;border-radius:14px;padding:14px;width:min(92vw,520px);max-height:80vh;overflow:auto}.ch{width:100%;text-align:left;background:#2c223e;color:#fff;border:1px solid #ffffff18;border-radius:10px;padding:10px;margin:5px 0}.small{font-size:11px;color:#bfb3cf}</style><div id="a"><div id="h"><div class="p"><b>MARA VALE</b> <span id="hp"></span><div class="b"><div id="hf" class="f"></div></div></div><div class="p">Depth <b id="d">1</b> • Relics <b id="r">0</b><div>Focus <span id="fo"></span></div><div class="b"><div id="ff" class="f q"></div></div></div></div><canvas id="c"></canvas><div id="log">The observatory remembers.</div><div class="ess"><button class="s" data-e="Ember">🔥 Ember</button><button data-e="Stone">🜨 Stone</button><button data-e="Echo">✦ Echo</button></div><div class="n" id="n"></div><div class="act"><button id="st">STRIKE</button><button id="te">TECHNIQUE</button><button id="aw">AWAKEN</button><button id="co">CODEX</button></div></div><div class="modal" id="m"><div class="card"><h2 id="mt"></h2><div id="ml"></div></div></div><script>(()=>{let C=document.querySelector('#c'),x=C.getContext('2d'),W,H,D=1,last=0,sel=['Ember'],depth=1,relics=[],msg=0,form=0,formT=0;let meta=JSON.parse(localStorage.hollowArcade||'{}');const P={hp:92,mhp:92,fo:40,mfo:40,ward:0};const defs={Saint:{hp:68,p:11,c:'#54817d',note:'Water dampens Ember. Stone pressure makes its veins brittle.'},Hound:{hp:62,p:12,c:'#a5a9be',note:'Reflects Echo until Burning distorts the reflection.'},Knight:{hp:84,p:12,c:'#817967',note:'Armor blunts strikes. Mark reveals seams for Stone.'},Choir:{hp:70,p:10,c:'#78649e',note:'Steals Focus. Mark turns part of the theft back.'},Warden:{hp:128,p:15,c:'#5e527e',note:'Resists your active form until its Seal is broken.'}};const pool=[['Cinder Key','Burn lowers Ember resistance.'],['Fault Lens','Fracture splashes bonus damage.'],['Mirror Nail','Ward retaliates when struck.'],['Ashen Thread','Wet + Burn creates Steam instead of cancelling.'],['Grave Index','New codex knowledge restores Focus.']];let E;function rs(){D=Math.min(devicePixelRatio||1,2);W=C.clientWidth;H=C.clientHeight;C.width=W*D;C.height=H*D;x.setTransform(D,0,0,D,0,0)}addEventListener('resize',rs);rs();function say(t){document.querySelector('#log').textContent=t;msg=2.4}function name(){if(sel.includes('Ember')&&sel.includes('Stone'))return'Furnace Eidolon';if(sel.includes('Ember')&&sel.includes('Echo'))return'Canticle Flame';if(sel.includes('Stone')&&sel.includes('Echo'))return'Fault Oracle';return sel[0]+' Aspect'}function desc(){if(sel.includes('Ember')&&sel.includes('Stone'))return'Burn + Fracture → MELT';if(sel.includes('Ember')&&sel.includes('Echo'))return'Burn + Mark → ECHOFLARE';if(sel.includes('Stone')&&sel.includes('Echo'))return'Mark exposes seams for Fracture';return sel[0]==='Ember'?'Build Burn':sel[0]==='Stone'?'Build Fracture + Ward':'Mark to reveal and twist'}function spawn(){let ks=Object.keys(defs),k=depth%5===0?'Warden':ks[Math.floor(Math.random()*4)],z=defs[k];E={k,hp:z.hp+depth*3,mhp:z.hp+depth*3,p:z.p+depth*.6,burn:0,wet:k==='Saint'?1:0,frac:0,mark:0,armor:k==='Knight'?2:0,seal:k==='Warden'?2:0};say('Depth '+depth+': '+k);up()}function know(key,text){meta[E.k]??={};if(!meta[E.k][key]){meta[E.k][key]=text;localStorage.hollowArcade=JSON.stringify(meta);if(relics.includes('Grave Index'))P.fo=Math.min(P.mfo,P.fo+4);say('Codex: '+text)}}function hurt(v,type){let m=1;if(type==='Ember'&&E.k==='Saint'&&E.wet)m=.4;if(type==='Echo'&&E.k==='Hound'&&!E.burn)m=.35;if(E.seal&&form)m=.45;if(type==='Physical'&&E.armor)m=.65;let d=Math.max(1,Math.round(v*m));E.hp-=d;return d}function tech(){if(P.fo<6)return say('Need Focus');P.fo-=6;if(sel.length===1){if(sel[0]==='Ember'){if(E.wet&&!relics.includes('Ashen Thread')){E.wet--;hurt(5,'Ember');say('Wet smothers the flame')}else{E.burn=2;hurt(9,'Ember');know('burn','Burn changes later interactions')}}else if(sel[0]==='Stone'){E.frac++;P.ward+=6;hurt(8,'Stone');if(E.frac>=2){E.armor=Math.max(0,E.armor-1);E.frac=0;hurt(7,'Stone');know('fracture','Repeated Stone can break protection')}}else{E.mark=2;hurt(6,'Echo');know('mark','Mark reveals and alters enemy rules')}}else if(sel.includes('Ember')&&sel.includes('Stone')){E.burn++;E.frac++;let b=E.burn&&E.frac?16:0;hurt(10+b,'Stone');if(b){E.armor=0;E.frac=0;know('melt','Burn + Fracture melts armor into damage')}}else if(sel.includes('Ember')&&sel.includes('Echo')){E.burn++;E.mark++;let b=E.burn&&E.mark?17:0;hurt(9+b,'Echo');if(b)know('flare','Burn + Mark creates Echoflare and bypasses reflection')}else{E.mark++;E.frac++;hurt(18,'Stone');if(E.mark)know('fault','Marked seams make Stone fracture easier')}turn()}function strike(){hurt(12,'Physical');turn()}function turn(){if(E.hp<=0)return win();let hit=Math.max(1,Math.round(E.p)-P.ward);P.ward=Math.max(0,P.ward-Math.round(E.p));P.hp-=hit;if(E.burn){E.hp-=5;E.burn--}if(E.wet)E.wet--;if(E.mark)E.mark--;if(E.seal)E.seal--;if(form&&--formT<=0)form=0;P.fo=Math.min(P.mfo,P.fo+2);if(E.hp<=0)return win();if(P.hp<=0){say('You wake at the entrance. Knowledge survived.');depth=Math.max(1,depth-1);P.hp=P.mhp;P.fo=P.mfo;setTimeout(spawn,700)}up()}function win(){depth++;P.hp=Math.min(P.mhp,P.hp+5);if(depth%3===0)choose();else setTimeout(spawn,500);up()}function choose(){let m=document.querySelector('#m');m.classList.add('on');document.querySelector('#mt').textContent='A relic wakes';let l=document.querySelector('#ml');l.innerHTML='';pool.filter(q=>!relics.includes(q[0])).sort(()=>Math.random()-.5).slice(0,3).forEach(q=>{let b=document.createElement('button');b.className='ch';b.innerHTML='<b>'+q[0]+'</b><div class=small>'+q[1]+'</div>';b.onclick=()=>{relics.push(q[0]);m.classList.remove('on');spawn()};l.appendChild(b)})}function codex(){let m=document.querySelector('#m');m.classList.add('on');document.querySelector('#mt').textContent='Field Codex';let l=document.querySelector('#ml');l.innerHTML='';for(const k of Object.keys(defs)){let d=document.createElement('div');d.className='ch';d.innerHTML='<b>'+k+'</b><div class=small>'+Object.values(meta[k]||{}).join('<br>')+'</div>';l.appendChild(d)}let b=document.createElement('button');b.className='ch';b.textContent='Return';b.onclick=()=>m.classList.remove('on');l.appendChild(b)}function up(){document.querySelector('#hp').textContent=Math.ceil(P.hp);document.querySelector('#fo').textContent=Math.ceil(P.fo);document.querySelector('#d').textContent=depth;document.querySelector('#r').textContent=relics.length;document.querySelector('#hf').style.width=100*P.hp/P.mhp+'%';document.querySelector('#ff').style.width=100*P.fo/P.mfo+'%';document.querySelector('#n').textContent=(form?'◆ ':'')+name()+' • '+desc()}document.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>{if(form)return say('Cannot reweave while awakened');let e=b.dataset.e;if(sel.includes(e)){if(sel.length>1)sel=sel.filter(v=>v!==e)}else{if(sel.length===2)sel.shift();sel.push(e)}document.querySelectorAll('[data-e]').forEach(q=>q.classList.toggle('s',sel.includes(q.dataset.e)));up()});document.querySelector('#st').onclick=strike;document.querySelector('#te').onclick=tech;document.querySelector('#aw').onclick=()=>{if(form){form=0;return up()}if(P.fo<12)return say('Need 12 Focus');P.fo-=12;form=1;formT=4;say('AWAKEN: '+name());up()};document.querySelector('#co').onclick=codex;function dr(){x.clearRect(0,0,W,H);let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#21172f');g.addColorStop(1,'#202733');x.fillStyle=g;x.fillRect(0,0,W,H);x.fillStyle='#433b54';for(let i=-1;i<5;i++){let a=i*145-depth*9%145;x.fillRect(a+20,30,16,H*.5);x.fillRect(a,30,65,12)}let hy=H*.72,hx=W*.25;x.fillStyle='#4e5f91';x.fillRect(hx-10,hy-40,20,38);x.fillStyle='#e4d0b3';x.fillRect(hx-8,hy-52,16,13);if(form){x.strokeStyle=sel.includes('Ember')?'#e98261':sel.includes('Stone')?'#d8c879':'#a58de1';x.beginPath();x.arc(hx,hy-24,28,0,7);x.stroke()}if(E){let ex=W*.72,ey=H*.68;x.fillStyle=defs[E.k].c;x.fillRect(ex-25,ey-55,50,56);x.fillStyle='#0008';x.fillRect(ex-35,ey+16,70,6);x.fillStyle='#df6a73';x.fillRect(ex-35,ey+16,70*E.hp/E.mhp,6);x.fillStyle='#fff';x.textAlign='center';x.fillText(E.k,ex,ey-66);let t=[];if(E.burn)t.push('Burn '+E.burn);if(E.wet)t.push('Wet');if(E.frac)t.push('Fracture '+E.frac);if(E.mark)t.push('Mark');if(E.armor)t.push('Armor '+E.armor);if(E.seal)t.push('Seal');x.fillText(t.join(' • '),ex,ey+38);x.textAlign='left'}}function loop(t){last=t;dr();requestAnimationFrame(loop)}spawn();requestAnimationFrame(loop);['contextmenu','selectstart','dragstart','gesturestart'].forEach(t=>addEventListener(t,e=>e.preventDefault(),{passive:false,capture:true}))})();</script>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#14111f">
+<title>The Hollow Constellation</title>
+<style>
+:root{
+  --bg:#14111f;--panel:#201a30;--panel2:#2a213b;--ink:#f4efff;--muted:#b7adca;
+  --gold:#f0d27a;--red:#df6a73;--blue:#69b7d3;--green:#78b884;--violet:#a384d8;
+  --safeT:max(10px,env(safe-area-inset-top));--safeB:max(10px,env(safe-area-inset-bottom));
+}
+*{
+  box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;
+  -webkit-touch-callout:none;-webkit-user-drag:none;touch-action:none;
+}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:var(--bg);color:var(--ink);
+font-family:ui-rounded,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button{font:inherit;color:inherit;border:0;-webkit-appearance:none;appearance:none}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;background:
+ radial-gradient(circle at 50% 0%,rgba(120,90,170,.12),transparent 42%),
+ linear-gradient(#171321,#0f0d17);overflow:hidden}
+#top{padding:var(--safeT) 10px 6px;display:flex;gap:8px;align-items:stretch;min-height:82px}
+.panel{background:rgba(31,25,47,.92);border:1px solid rgba(255,255,255,.11);border-radius:14px;box-shadow:0 8px 22px rgba(0,0,0,.22)}
+#heroHud{flex:1;padding:9px}
+#runHud{width:128px;padding:9px}
+.row{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px}
+.name{font-weight:900;letter-spacing:.02em}
+.bar{height:7px;background:#0b0911;border-radius:99px;overflow:hidden;border:1px solid rgba(255,255,255,.07);margin:4px 0}
+.fill{height:100%;width:100%}.hp{background:linear-gradient(90deg,#b64d58,#f18b7b)}.focus{background:linear-gradient(90deg,#5b70c3,#9b82df)}
+#stage{position:relative;flex:1;min-height:0;margin:0 8px;overflow:hidden;border-radius:16px;border:1px solid rgba(255,255,255,.10);
+background:linear-gradient(#241c35 0 31%,#3c3750 31% 32%,#2d3541 32% 100%)}
+canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges}
+#banner{position:absolute;top:10px;left:50%;transform:translateX(-50%) translateY(-8px);padding:7px 11px;border-radius:10px;
+background:rgba(10,8,16,.74);border:1px solid rgba(255,255,255,.12);font-size:12px;font-weight:800;opacity:0;transition:.15s;pointer-events:none;text-align:center;max-width:86%}
+#banner.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#intent{position:absolute;top:48px;left:50%;transform:translateX(-50%);font-size:11px;color:#eee7ff;background:rgba(15,12,24,.68);
+border-radius:9px;padding:5px 8px;pointer-events:none}
+#bottom{padding:7px 9px var(--safeB);display:flex;flex-direction:column;gap:7px}
+#essenceBar{display:flex;gap:6px;justify-content:center}
+.ess{min-width:72px;padding:8px 8px;border-radius:12px;background:#1f1930;border:1px solid rgba(255,255,255,.12);font-weight:900;font-size:11px}
+.ess.sel{outline:2px solid var(--gold);background:#35284e;transform:translateY(-2px)}
+#formLine{text-align:center;font-size:11px;color:#dcd2ef;min-height:17px}
+#actions{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.action{min-height:64px;border-radius:14px;background:linear-gradient(#302642,#211a30);border:1px solid rgba(255,255,255,.13);
+font-weight:900;font-size:11px;box-shadow:inset 0 1px rgba(255,255,255,.07),0 6px 16px rgba(0,0,0,.20)}
+.action:active{transform:translateY(1px) scale(.985)}
+.action b{display:block;font-size:14px;margin-bottom:2px}
+#utility{display:flex;gap:6px}
+.util{flex:1;padding:8px;border-radius:10px;background:#1d182a;border:1px solid rgba(255,255,255,.10);font-size:11px;font-weight:800}
+.modal{position:fixed;inset:0;z-index:20;background:rgba(8,7,13,.88);display:none;align-items:center;justify-content:center;padding:14px}
+.modal.open{display:flex}
+.modal.forceHidden{display:none !important}
+.card{width:min(94vw,640px);max-height:86vh;overflow:auto;background:#211b30;border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:17px;
+box-shadow:0 24px 80px rgba(0,0,0,.45)}
+h1,h2,h3{margin:0 0 8px}h1{font-size:23px}h2{font-size:18px}.small{font-size:12px;color:var(--muted);line-height:1.5}
+.choice{width:100%;text-align:left;padding:12px;margin:6px 0;border-radius:12px;background:#2a223a;border:1px solid rgba(255,255,255,.11)}
+.choice strong{display:block}.choice span{font-size:11px;color:#c3b9d5}
+.entry{padding:10px 0;border-top:1px solid rgba(255,255,255,.09)}.tag{display:inline-block;margin:4px 4px 0 0;padding:2px 7px;border-radius:99px;background:#342845;font-size:10px}
+#start{display:flex}.startBtns{display:grid;grid-template-columns:1fr;gap:8px;margin-top:14px}
+.big{padding:14px;border-radius:14px;background:#604b89;border:1px solid rgba(255,255,255,.16);font-weight:900}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.legend div{padding:8px;background:#191522;border-radius:10px}
+#dialogue{position:absolute;left:8px;right:8px;bottom:8px;background:rgba(14,11,21,.84);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:9px 10px;font-size:11px;line-height:1.4;display:none}
+#dialogue.show{display:block}
+@media(min-width:700px){
+  #app{max-width:720px;left:50%;transform:translateX(-50%);border-left:1px solid #2b2437;border-right:1px solid #2b2437}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="top">
+    <div class="panel" id="heroHud">
+      <div class="row"><span class="name">Mara Vale</span><span id="formName">Unbound</span></div>
+      <div class="row"><span>Vitality</span><span id="hpTxt"></span></div>
+      <div class="bar"><div class="fill hp" id="hpFill"></div></div>
+      <div class="row"><span>Focus</span><span id="focusTxt"></span></div>
+      <div class="bar"><div class="fill focus" id="focusFill"></div></div>
+    </div>
+    <div class="panel" id="runHud">
+      <div class="row"><span>Depth</span><b id="depthTxt">1</b></div>
+      <div class="row"><span>Shards</span><b id="shardTxt">0</b></div>
+      <div class="row"><span>Relics</span><b id="relicTxt">0</b></div>
+    </div>
+  </div>
+
+  <div id="stage">
+    <canvas id="game"></canvas>
+    <div id="banner"></div>
+    <div id="intent"></div>
+    <div id="dialogue"></div>
+  </div>
+
+  <div id="bottom">
+    <div id="essenceBar">
+      <button class="ess sel" data-e="Ember">🔥 Ember</button>
+      <button class="ess" data-e="Stone">🜨 Stone</button>
+      <button class="ess" data-e="Echo">✦ Echo</button>
+    </div>
+    <div id="formLine"></div>
+    <div id="actions">
+      <button class="action" id="strike"><b>⚔ Strike</b>reliable damage</button>
+      <button class="action" id="tech"><b>✦ Technique</b>essence skill</button>
+      <button class="action" id="shift"><b>⟳ Shift</b>change stance</button>
+      <button class="action" id="form"><b>◆ Awaken</b>transform</button>
+    </div>
+    <div id="utility">
+      <button class="util" id="codexBtn">📖 Codex</button>
+      <button class="util" id="relicBtn">🧿 Relics</button>
+      <button class="util" id="restBtn">⛺ Camp</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="start">
+  <div class="card">
+    <h1>The Hollow Constellation</h1>
+    <div class="small">
+      Mara Vale came to the drowned observatory looking for her missing brother. Instead she found a machine beneath the stars that remembers every creature it kills.<br><br>
+      Pair two Essences. Transform. Learn what enemies actually obey. Then decide which rules are worth breaking.
+    </div>
+    <div class="legend">
+      <div><b>Experiment</b><div class="small">Statuses interact and can be transformed.</div></div>
+      <div><b>Knowledge</b><div class="small">Your codex remembers discoveries across runs.</div></div>
+      <div><b>Build</b><div class="small">Relics change rules, not just numbers.</div></div>
+      <div><b>Recover</b><div class="small">Failure costs a run, not your knowledge.</div></div>
+    </div>
+    <div class="startBtns"><button class="big" id="startBtn" type="button" draggable="false">Descend into the observatory</button></div>
+  </div>
+</div>
+
+<div class="modal" id="codex"><div class="card"><h2>Field Codex</h2><div class="small">Only proven interactions are recorded.</div><div id="codexEntries"></div><button class="big" id="closeCodex">Return</button></div></div>
+<div class="modal" id="relics"><div class="card"><h2>Relics</h2><div class="small">Every relic alters a rule of the system.</div><div id="relicEntries"></div><button class="big" id="closeRelics">Return</button></div></div>
+<div class="modal" id="choice"><div class="card"><h2 id="choiceTitle">Choose</h2><div class="small" id="choiceSub"></div><div id="choiceList"></div></div></div>
+
+<script>
+(()=>{
+const C=document.getElementById('game'),ctx=C.getContext('2d');
+let W=0,H=0,DPR=1;
+function resize(){DPR=Math.min(devicePixelRatio||1,2);W=C.clientWidth;H=C.clientHeight;C.width=W*DPR;C.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0)}
+addEventListener('resize',resize);setTimeout(resize,0);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const rand=a=>a[Math.floor(Math.random()*a.length)];
+const saveKey='hollowConstellationSaveV1';
+let meta=JSON.parse(localStorage.getItem(saveKey)||'{"codex":{},"unlocks":[],"bestDepth":0}');
+const S={running:false,depth:1,shards:0,relics:[],ess:['Ember'],turn:0,bannerT:0,shake:0,flash:0,room:'battle',musicStep:0};
+const P={hp:92,maxHp:92,focus:40,maxFocus:40,form:false,formT:0,ward:0,tempo:0,emberHeart:0,stoneSkin:0,echoMark:0};
+let E=null,particles=[],audio=null,musicTimer=null;
+
+const enemyDefs={
+  'Mire Saint':{hp:72,pow:10,art:'saint',note:'Its water-veins dampen Ember, but become brittle after Stone pressure.',intent:['Drown','Veil','Drown']},
+  'Glass Hound':{hp:62,pow:12,art:'hound',note:'Reflects direct Echo damage. A Burning target cannot reflect sound cleanly.',intent:['Lunge','Howl','Lunge']},
+  'Root Knight':{hp:88,pow:11,art:'knight',note:'Armor blunts strikes. Echo can reveal seams; Stone can then fracture them.',intent:['Brace','Cleave','Cleave']},
+  'Starved Choir':{hp:68,pow:9,art:'choir',note:'Steals Focus when unmarked. Echo Marks reverse part of the theft.',intent:['Chant','Drain','Chant']},
+  'Astral Warden':{hp:128,pow:14,art:'warden',note:'Resists your active form. Breaking its Sigil lets your form damage become effective.',intent:['Seal','Crush','Mirror','Crush']}
+};
+
+const relicPool=[
+ {id:'cinderKey',name:'Cinder Key',desc:'Burning enemies lose 1 resistance tier to Ember effects.',rule:'burnPierce'},
+ {id:'echoLatch',name:'Echo Latch',desc:'Applying Echo Mark to a Burning enemy refunds 3 Focus.',rule:'echoRefund'},
+ {id:'faultLens',name:'Fault Lens',desc:'Fracture deals splash damage when it breaks armor.',rule:'fractureSplash'},
+ {id:'sutureBell',name:'Suture Bell',desc:'Ending a battle with an active status heals 8 Vitality.',rule:'statusHeal'},
+ {id:'blackCompass',name:'Black Compass',desc:'Your first Shift each battle is free and grants Tempo.',rule:'freeShift'},
+ {id:'mirrorNail',name:'Mirror Nail',desc:'Ward retaliates with 4 damage when struck.',rule:'wardThorns'},
+ {id:'ashenThread',name:'Ashen Thread',desc:'Ignite consumes Wet instead of being blocked by it, creating Steam.',rule:'steamIgnite'},
+ {id:'graveIndex',name:'Grave Index',desc:'New codex discoveries grant 1 permanent Focus for the run.',rule:'learnFocus'}
+];
+
+function hasRule(r){return S.relics.some(x=>x.rule===r)}
+function banner(t){const b=document.getElementById('banner');b.textContent=t;b.classList.add('show');S.bannerT=2}
+function dialogue(t){const d=document.getElementById('dialogue');d.textContent=t;d.classList.add('show');setTimeout(()=>d.classList.remove('show'),3300)}
+function discover(enemy,key,text){
+ meta.codex[enemy]??={};
+ if(!meta.codex[enemy][key]){
+   meta.codex[enemy][key]=text;
+   if(hasRule('learnFocus')){P.maxFocus++;P.focus=Math.min(P.maxFocus,P.focus+1)}
+   localStorage.setItem(saveKey,JSON.stringify(meta));
+   banner('Codex updated: '+text);
+ }
+}
+function px(v){return Math.round(v)}
+function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(px(x),px(y),px(w),px(h))}
+function text(t,x,y,c='#fff',s=12,a='left'){ctx.fillStyle=c;ctx.font=`bold ${s}px system-ui`;ctx.textAlign=a;ctx.fillText(t,px(x),px(y));ctx.textAlign='left'}
+
+function spawn(){
+ const names=S.depth%5===0?['Astral Warden']:Object.keys(enemyDefs).filter(x=>x!=='Astral Warden');
+ const name=rand(names),d=enemyDefs[name];
+ E={name,hp:d.hp+Math.floor(S.depth*3.2),maxHp:d.hp+Math.floor(S.depth*3.2),pow:d.pow+Math.floor(S.depth*.6),statuses:{Burn:0,Wet:0,Fracture:0,Mark:0,Seal:0},armor:name==='Root Knight'?2:0,resist:name==='Mire Saint'?{Ember:2}:name==='Glass Hound'?{Echo:2}:{},turn:0,intent:d.intent[0],flash:0,hitT:0};
+ if(name==='Astral Warden')E.statuses.Seal=2;
+ dialogue(S.depth===1?'The first thing in the dark is praying. It has no mouth.':name==='Astral Warden'?'The machine finally sends something that knows your name.':'Something moves beneath the star-glass.');
+ updateHud();
+}
+function currentForm(){
+ const e=S.ess;
+ if(e.includes('Ember')&&e.includes('Stone'))return 'Furnace Eidolon';
+ if(e.includes('Ember')&&e.includes('Echo'))return 'Canticle Flame';
+ if(e.includes('Stone')&&e.includes('Echo'))return 'Fault Oracle';
+ if(e.includes('Ember'))return 'Cinder Aspect';
+ if(e.includes('Stone'))return 'Graven Aspect';
+ if(e.includes('Echo'))return 'Resonant Aspect';
+ return 'Unbound';
+}
+function formDesc(){
+ const e=S.ess;
+ if(e.includes('Ember')&&e.includes('Stone'))return 'Burn + Fracture can MELT armor into bonus damage.';
+ if(e.includes('Ember')&&e.includes('Echo'))return 'Burn + Mark creates ECHOFLARE, bypassing reflected sound.';
+ if(e.includes('Stone')&&e.includes('Echo'))return 'Mark exposes seams; Fracture becomes much easier to trigger.';
+ if(e.includes('Ember'))return 'Build Heat, then Ignite. Burning changes several enemy rules.';
+ if(e.includes('Stone'))return 'Build Pressure into Fracture and Ward against heavy hits.';
+ if(e.includes('Echo'))return 'Apply Mark to reveal hidden traits and twist enemy effects.';
+ return '';
+}
+function setEssence(v){
+ if(S.form){banner('You cannot reweave Essences while transformed.');return}
+ if(S.ess.includes(v)){if(S.ess.length>1)S.ess=S.ess.filter(x=>x!==v)}
+ else{if(S.ess.length>=2)S.ess.shift();S.ess.push(v)}
+ document.querySelectorAll('.ess').forEach(b=>b.classList.toggle('sel',S.ess.includes(b.dataset.e)));
+ updateHud(); tone(v);
+}
+function resistance(type){
+ let r=E.resist[type]||0;
+ if(type==='Ember'&&E.statuses.Burn>0&&hasRule('burnPierce'))r=Math.max(0,r-1);
+ if(type==='Echo'&&E.name==='Glass Hound'&&E.statuses.Burn>0)r=0;
+ if(E.statuses.Seal>0&&S.form)r=Math.max(r,2);
+ return r;
+}
+function dmg(base,type='Physical',label=''){
+ let m=1;
+ const r=resistance(type);
+ if(r===1)m=.72;if(r>=2)m=.36;
+ if(E.armor>0&&type==='Physical')m*=.65;
+ let d=Math.max(1,Math.round(base*m));
+ E.hp-=d;E.flash=.15;E.hitT=.2;part(48,45,type==='Ember'?'#f18966':type==='Stone'?'#e0cf8a':type==='Echo'?'#a88de8':'#fff',8);
+ float(label?label+' '+d:String(d),50,38);
+ if(r>=2)discover(E.name,'resist_'+type,E.name+' strongly resists '+type+' unless its condition is altered.');
+ return d;
+}
+function applyStatus(k,n=1){
+ E.statuses[k]=(E.statuses[k]||0)+n;
+ if(k==='Burn'&&E.statuses.Wet>0){
+   if(hasRule('steamIgnite')){
+     E.statuses.Wet=0;E.statuses.Burn=Math.max(E.statuses.Burn,2);dmg(10,'Ember','STEAM');
+     discover(E.name,'steam','Wet can be consumed into Steam instead of blocking Ignite.');
+   }else{
+     E.statuses.Wet=Math.max(0,E.statuses.Wet-1);E.statuses.Burn=Math.max(0,E.statuses.Burn-1);
+     banner('Wet smothers part of the Burn.');
+   }
+ }
+ if(k==='Mark'&&E.statuses.Burn>0&&hasRule('echoRefund'))P.focus=Math.min(P.maxFocus,P.focus+3);
+}
+function technique(){
+ if(!E||E.hp<=0)return;
+ const es=S.ess;
+ let cost=6;
+ if(P.focus<cost){banner('Not enough Focus.');return}
+ P.focus-=cost;
+ if(es.length===1){
+   if(es[0]==='Ember'){
+     if(E.statuses.Wet>0&&!hasRule('steamIgnite')){E.statuses.Wet--;dmg(7,'Ember','HISS');banner('Water dampened the flame.')}
+     else{applyStatus('Burn',2);dmg(9,'Ember','EMBER');discover(E.name,'burn','Ember can establish Burn, changing later interactions.')}
+   }else if(es[0]==='Stone'){
+     applyStatus('Fracture',1);P.ward+=5;dmg(8,'Stone','PRESS');
+     if(E.statuses.Fracture>=2){E.armor=Math.max(0,E.armor-1);dmg(8,'Stone','BREAK');E.statuses.Fracture=0;discover(E.name,'fracture','Repeated Stone pressure can fracture protection.')}
+   }else{
+     applyStatus('Mark',2);dmg(6,'Echo','MARK');
+     discover(E.name,'mark','Echo Mark reveals behavior and can alter enemy effects.');
+   }
+ }else if(es.includes('Ember')&&es.includes('Stone')){
+   applyStatus('Burn',1);applyStatus('Fracture',1);
+   let bonus=(E.statuses.Burn>0&&E.statuses.Fracture>0)?14:0;
+   dmg(10+bonus,'Stone',bonus?'MELT':'FORGE');
+   if(bonus){E.armor=0;E.statuses.Fracture=0;discover(E.name,'melt','Burn plus Fracture can melt armor into direct damage.')}
+ }else if(es.includes('Ember')&&es.includes('Echo')){
+   applyStatus('Burn',1);applyStatus('Mark',1);
+   let bonus=(E.statuses.Burn>0&&E.statuses.Mark>0)?16:0;
+   dmg(9+bonus,'Echo',bonus?'ECHOFLARE':'CHANT');
+   if(bonus)discover(E.name,'echoflare','Burn plus Echo Mark creates Echoflare, bypassing some Echo defenses.');
+ }else{
+   applyStatus('Mark',1);applyStatus('Fracture',1);
+   let bonus=E.statuses.Mark>0?10:0;
+   dmg(9+bonus,'Stone',bonus?'FAULT':'SEAM');
+   if(E.statuses.Fracture>=2){E.armor=Math.max(0,E.armor-1);E.statuses.Fracture=0;discover(E.name,'fault','Marked seams make Stone fracture much more efficient.')}
+ }
+ afterPlayer();
+}
+function strike(){
+ if(!E||E.hp<=0)return;
+ let base=11+P.tempo*2;
+ if(E.statuses.Fracture>0)base+=3;
+ dmg(base,'Physical',P.tempo?'TEMPO':'STRIKE');
+ P.tempo=Math.max(0,P.tempo-1);
+ afterPlayer();
+}
+function shift(){
+ if(!E)return;
+ const free=hasRule('freeShift')&&!S.shiftedThisBattle;
+ if(!free){
+   if(P.focus<3){banner('Need 3 Focus to Shift.');return}
+   P.focus-=3;
+ }
+ S.shiftedThisBattle=true;P.tempo=Math.min(3,P.tempo+1);
+ if(S.ess[0]==='Ember')setEssence('Stone');
+ else if(S.ess[0]==='Stone')setEssence('Echo');
+ else setEssence('Ember');
+ banner('Tempo +1. Your next Strike hits harder.');
+ if(!free)afterPlayer(); else updateHud();
+}
+function awaken(){
+ if(S.form){S.form=false;P.formT=0;banner('You release the constellation.');updateHud();return}
+ if(P.focus<12){banner('Need 12 Focus to Awaken.');return}
+ P.focus-=12;S.form=true;P.formT=4;
+ banner('AWAKEN: '+currentForm());
+ part(28,65,'#d9b8ff',20);tone('Form');
+ updateHud();
+}
+function afterPlayer(){
+ if(E.hp<=0){win();return}
+ enemyTurn();
+}
+function enemyTurn(){
+ E.turn++;
+ const def=enemyDefs[E.name];
+ E.intent=def.intent[E.turn%def.intent.length];
+ let attack=true,amount=E.pow;
+ if(E.name==='Mire Saint'){
+   if(E.intent==='Veil'){E.statuses.Wet+=2;E.resist.Ember=2;banner('The Saint floods its veins. WET +2');attack=false}
+   else{P.ward=Math.max(0,P.ward-1);E.statuses.Wet+=1}
+ }else if(E.name==='Glass Hound'){
+   if(E.intent==='Howl'){P.focus=Math.max(0,P.focus-5);banner('The howl tears 5 Focus away.');attack=false}
+ }else if(E.name==='Root Knight'){
+   if(E.intent==='Brace'){E.armor=Math.min(3,E.armor+1);banner('The Knight braces. Armor rises.');attack=false}
+ }else if(E.name==='Starved Choir'){
+   if(E.intent==='Drain'){
+     let steal=6;
+     if(E.statuses.Mark>0){steal=2;P.focus=Math.min(P.maxFocus,P.focus+2);discover(E.name,'reverseDrain','Echo Mark partially reverses the Choir’s Focus theft.')}
+     P.focus=Math.max(0,P.focus-steal);banner('The Choir drinks '+steal+' Focus.');attack=false;
+   }
+ }else if(E.name==='Astral Warden'){
+   if(E.intent==='Seal'){E.statuses.Seal=2;banner('A sigil seals your current form.');attack=false}
+   if(E.intent==='Mirror'&&S.form){E.statuses.Seal=2;banner('The Warden mirrors your active constellation.');attack=false}
+ }
+ if(attack){
+   if(S.form&&S.ess.includes('Stone'))P.ward+=3;
+   let hit=Math.max(1,amount-P.ward);
+   let blocked=amount-hit;P.ward=Math.max(0,P.ward-amount);
+   P.hp-=hit;
+   if(blocked&&hasRule('wardThorns')){E.hp-=4;float('THORNS 4',50,38)}
+   float('-'+hit+' HP',25,72);S.shake=.18;
+ }
+ for(const k of ['Burn','Wet','Fracture','Mark','Seal'])if(E.statuses[k]>0)E.statuses[k]--;
+ if(E.statuses.Burn>0){E.hp-=5;float('BURN 5',50,38);if(E.hp<=0){win();return}}
+ if(S.form){P.formT--;if(P.formT<=0){S.form=false;banner('The constellation fades.')}}
+ P.focus=Math.min(P.maxFocus,P.focus+2);
+ if(P.hp<=0)lose(); else updateHud();
+}
+function win(){
+ const heal=hasRule('statusHeal')&&Object.values(E.statuses).some(v=>v>0)?8:0;
+ if(heal){P.hp=Math.min(P.maxHp,P.hp+heal);banner('Suture Bell restores 8 Vitality.')}
+ S.shards+=2+Math.floor(S.depth/3);
+ S.depth++;meta.bestDepth=Math.max(meta.bestDepth,S.depth);localStorage.setItem(saveKey,JSON.stringify(meta));
+ if(S.depth%3===0)chooseRelic(); else if(S.depth%4===0)campChoice(); else{setTimeout(spawn,650)}
+ updateHud();
+}
+function lose(){
+ S.running=false;
+ dialogue('Mara wakes beneath the entrance arch. The observatory has forgotten the wounds. The codex has not.');
+ document.getElementById('choice').classList.add('open');
+ document.getElementById('choiceTitle').textContent='The observatory rejects you';
+ document.getElementById('choiceSub').textContent='Your field notes survived. Begin again with what you learned.';
+ const l=document.getElementById('choiceList');l.innerHTML='';
+ const b=document.createElement('button');b.className='choice';b.innerHTML='<strong>Descend again</strong><span>Knowledge persists. Relics do not.</span>';
+ b.onclick=()=>{document.getElementById('choice').classList.remove('open');newRun()};l.appendChild(b);
+}
+function chooseRelic(){
+ const options=[...relicPool].filter(r=>!S.relics.some(x=>x.id===r.id)).sort(()=>Math.random()-.5).slice(0,3);
+ document.getElementById('choice').classList.add('open');
+ document.getElementById('choiceTitle').textContent='A relic wakes';
+ document.getElementById('choiceSub').textContent='Choose a rule to add to your build.';
+ const l=document.getElementById('choiceList');l.innerHTML='';
+ options.forEach(r=>{
+   const b=document.createElement('button');b.className='choice';b.innerHTML='<strong>'+r.name+'</strong><span>'+r.desc+'</span>';
+   b.onclick=()=>{S.relics.push(r);document.getElementById('choice').classList.remove('open');banner('Relic acquired: '+r.name);spawn();updateHud()};l.appendChild(b);
+ });
+}
+function campChoice(){
+ document.getElementById('choice').classList.add('open');
+ document.getElementById('choiceTitle').textContent='A dry chamber';
+ document.getElementById('choiceSub').textContent='You have enough time for one decision.';
+ const l=document.getElementById('choiceList');l.innerHTML='';
+ [
+  ['Rest','Restore 28 Vitality.',()=>P.hp=Math.min(P.maxHp,P.hp+28)],
+  ['Meditate','Increase max Focus by 4 this run.',()=>{P.maxFocus+=4;P.focus+=4}],
+  ['Etch a shard','Spend 5 shards to gain +8 max Vitality.',()=>{if(S.shards>=5){S.shards-=5;P.maxHp+=8;P.hp+=8}else banner('Not enough shards.') }]
+ ].forEach(([n,d,fn])=>{const b=document.createElement('button');b.className='choice';b.innerHTML='<strong>'+n+'</strong><span>'+d+'</span>';b.onclick=()=>{fn();document.getElementById('choice').classList.remove('open');spawn();updateHud()};l.appendChild(b)})
+}
+function newRun(){
+ S.depth=1;S.shards=0;S.relics=[];S.ess=['Ember'];S.form=false;S.shiftedThisBattle=false;
+ P.hp=P.maxHp=92;P.focus=P.maxFocus=40;P.ward=P.tempo=0;
+ document.querySelectorAll('.ess').forEach(b=>b.classList.toggle('sel',b.dataset.e==='Ember'));
+ spawn();updateHud();S.running=true;
+}
+function camp(){if(E&&E.hp>0){banner('You cannot camp while something is trying to kill you.');return}campChoice()}
+function renderCodex(){
+ const root=document.getElementById('codexEntries');root.innerHTML='';
+ Object.entries(enemyDefs).forEach(([n,d])=>{const found=meta.codex[n]||{};const div=document.createElement('div');div.className='entry';
+ div.innerHTML='<b>'+n+'</b><div class="small">'+(Object.keys(found).length?d.note:'No reliable field notes yet.')+'</div>'+Object.values(found).map(x=>'<span class="tag">'+x+'</span>').join('');root.appendChild(div)})
+}
+function renderRelics(){
+ const root=document.getElementById('relicEntries');root.innerHTML='';
+ if(!S.relics.length)root.innerHTML='<div class="entry small">No relics yet. Every third depth offers one.</div>';
+ S.relics.forEach(r=>{const d=document.createElement('div');d.className='entry';d.innerHTML='<b>'+r.name+'</b><div class="small">'+r.desc+'</div>';root.appendChild(d)})
+}
+function updateHud(){
+ document.getElementById('hpTxt').textContent=Math.ceil(P.hp)+' / '+P.maxHp;
+ document.getElementById('focusTxt').textContent=Math.ceil(P.focus)+' / '+P.maxFocus;
+ document.getElementById('hpFill').style.width=100*P.hp/P.maxHp+'%';
+ document.getElementById('focusFill').style.width=100*P.focus/P.maxFocus+'%';
+ document.getElementById('depthTxt').textContent=S.depth;document.getElementById('shardTxt').textContent=S.shards;document.getElementById('relicTxt').textContent=S.relics.length;
+ document.getElementById('formName').textContent=S.form?currentForm():'Unbound';
+ document.getElementById('formLine').textContent=currentForm()+' • '+formDesc();
+ document.getElementById('intent').textContent=E?'Intent: '+E.intent:'';
+}
+function part(xp,yp,c,n){for(let i=0;i<n;i++)particles.push({x:xp+Math.random()*4-2,y:yp+Math.random()*4-2,vx:(Math.random()-.5)*40,vy:(Math.random()-.5)*40,t:.5,c})}
+function float(t,x,y){particles.push({text:t,x,y,vx:0,vy:-18,t:.8,c:'#fff'})}
+function draw(){
+ ctx.clearRect(0,0,W,H);
+ const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#21172f');g.addColorStop(.45,'#342b48');g.addColorStop(1,'#202733');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ ctx.fillStyle='rgba(240,229,255,.55)';for(let i=0;i<30;i++)ctx.fillRect((i*83+S.depth*17)%W,18+(i*37)%Math.max(80,H*.35),2,2);
+ ctx.fillStyle='#433b54';for(let i=-1;i<5;i++){let x=i*150-(S.depth*13%150);ctx.fillRect(x+24,66,18,H*.42);ctx.fillRect(x,66,72,14)}
+ ctx.fillStyle='#29313c';ctx.fillRect(0,H*.52,W,H*.48);
+ for(let y=H*.58;y<H;y+=38){ctx.fillStyle='rgba(255,255,255,.03)';ctx.fillRect(0,y,W,2)}
+ const hx=W*.27,hy=H*.72;
+ ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(hx,hy+13,28,9,0,0,Math.PI*2);ctx.fill();
+ rect(hx-10,hy-42,20,37,'#4e5f91');rect(hx-8,hy-52,16,13,'#e6d1b4');rect(hx-13,hy-56,26,7,'#8a5a76');
+ rect(hx-7,hy-5,6,18,'#5a3e36');rect(hx+2,hy-5,6,18,'#5a3e36');
+ if(S.form){ctx.strokeStyle=S.ess.includes('Ember')?'#e98261':S.ess.includes('Stone')?'#d8c879':'#a58de1';ctx.lineWidth=3;ctx.beginPath();ctx.arc(hx,hy-25,31,0,Math.PI*2);ctx.stroke()}
+ if(E){
+   const ex=W*.72,ey=H*.67;ctx.save();if(E.flash>0)ctx.globalAlpha=.45;
+   ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(ex,ey+18,36,11,0,0,Math.PI*2);ctx.fill();
+   if(enemyDefs[E.name].art==='saint'){rect(ex-22,ey-55,44,58,'#507a78');rect(ex-11,ey-68,22,16,'#d7d9bd');rect(ex-27,ey-34,10,36,'#6ca2a0')}
+   else if(enemyDefs[E.name].art==='hound'){rect(ex-28,ey-34,52,28,'#a2a8bc');rect(ex+15,ey-47,25,18,'#d4dae9');rect(ex-20,ey-9,7,25,'#6a6f7d');rect(ex+10,ey-9,7,25,'#6a6f7d')}
+   else if(enemyDefs[E.name].art==='knight'){rect(ex-24,ey-58,48,61,'#756e61');rect(ex-13,ey-72,26,18,'#c7b982');rect(ex+20,ey-43,15,44,'#8e835e')}
+   else if(enemyDefs[E.name].art==='choir'){for(let i=0;i<3;i++){rect(ex-30+i*22,ey-54-(i%2)*8,18,52,'#75639c');rect(ex-26+i*22,ey-65-(i%2)*8,10,12,'#ded4c0')}}
+   else{rect(ex-28,ey-64,56,68,'#594e76');rect(ex-16,ey-78,32,17,'#d6c995');rect(ex-35,ey-38,12,40,'#8175a6');rect(ex+23,ey-38,12,40,'#8175a6')}
+   ctx.restore();
+   rect(ex-40,ey+29,80,7,'rgba(0,0,0,.5)');rect(ex-39,ey+30,78*clamp(E.hp/E.maxHp,0,1),5,'#de6a73');
+   text(E.name,ex,ey-86,'#fff',12,'center');
+   let tags=[];for(const [k,v] of Object.entries(E.statuses))if(v>0)tags.push(k+' '+v);if(E.armor>0)tags.push('Armor '+E.armor);
+   text(tags.join(' • '),ex,ey+49,'#e7d7ff',10,'center');
+ }
+ for(const p of particles){p.t-=1/60;p.x+=p.vx/60;p.y+=p.vy/60;p.vy+=12/60;ctx.globalAlpha=clamp(p.t*2,0,1);
+   if(p.text)text(p.text,W*p.x/100,H*p.y/100,p.c,12,'center');else{ctx.fillStyle=p.c;ctx.fillRect(W*p.x/100,H*p.y/100,4,4)}}
+ particles=particles.filter(p=>p.t>0);ctx.globalAlpha=1;
+ if(S.shake>0)S.shake-=1/60;if(S.flash>0)S.flash-=1/60;
+}
+function loop(){
+ if(started){
+   const overlay=document.getElementById('start');
+   if(overlay && !overlay.classList.contains('forceHidden')){
+     overlay.classList.remove('open');
+     overlay.classList.add('forceHidden');
+     overlay.style.display='none';
+   }
+ }
+ if(S.bannerT>0){
+   S.bannerT-=1/60;
+   if(S.bannerT<=0)document.getElementById('banner').classList.remove('show');
+ }
+ if(E){
+   E.flash=Math.max(0,E.flash-1/60);
+   E.hitT=Math.max(0,E.hitT-1/60);
+ }
+ draw();
+ requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+function tone(kind){
+ if(!audio)return;let f=kind==='Ember'?392:kind==='Stone'?261.6:kind==='Echo'?523.3:659.2;
+ const o=audio.createOscillator(),g=audio.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.0001,audio.currentTime);g.gain.exponentialRampToValueAtTime(.05,audio.currentTime+.015);g.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+.18);o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+.2)
+}
+function music(){
+ if(!audio)return;const seq=[146.8,174.6,220,196,174.6,130.8,164.8,196];const f=seq[S.musicStep++%seq.length];
+ const o=audio.createOscillator(),g=audio.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.0001,audio.currentTime);g.gain.exponentialRampToValueAtTime(.017,audio.currentTime+.03);g.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+.42);o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+.45)
+}
+function startAudio(){try{audio=new(window.AudioContext||window.webkitAudioContext)();musicTimer=setInterval(music,430)}catch(_){}}
+
+document.querySelectorAll('.ess').forEach(b=>{
+ let lt=0;b.addEventListener('touchend',e=>{e.preventDefault();lt=performance.now();setEssence(b.dataset.e)},{passive:false});
+ b.addEventListener('click',e=>{e.preventDefault();if(performance.now()-lt<450)return;setEssence(b.dataset.e)})
+});
+document.getElementById('strike').onclick=strike;document.getElementById('tech').onclick=technique;document.getElementById('shift').onclick=shift;document.getElementById('form').onclick=awaken;
+document.getElementById('restBtn').onclick=camp;
+document.getElementById('codexBtn').onclick=()=>{renderCodex();document.getElementById('codex').classList.add('open')};
+document.getElementById('relicBtn').onclick=()=>{renderRelics();document.getElementById('relics').classList.add('open')};
+document.getElementById('closeCodex').onclick=()=>document.getElementById('codex').classList.remove('open');
+document.getElementById('closeRelics').onclick=()=>document.getElementById('relics').classList.remove('open');
+let started=false;
+function startGame(e){
+  if(e){e.preventDefault();e.stopPropagation();}
+  if(started)return;
+  started=true;
+
+  const overlay=document.getElementById('start');
+  overlay.classList.remove('open');
+  overlay.classList.add('forceHidden');
+  overlay.style.display='none';
+  overlay.setAttribute('aria-hidden','true');
+
+  startAudio();
+  newRun();
+  banner('The observatory remembers you.');
+}
+const startBtn=document.getElementById('startBtn');
+startBtn.addEventListener('touchend',startGame,{passive:false});
+startBtn.addEventListener('click',startGame,{passive:false});
+['contextmenu','selectstart','dragstart','gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{capture:true,passive:false}));
+document.addEventListener('touchmove',e=>e.preventDefault(),{capture:true,passive:false});
+document.addEventListener('visibilitychange',()=>{if(audio){if(document.hidden)audio.suspend();else audio.resume()}});
+resize();updateHud();
+})();
+</script>
+</body>
+</html>
