@@ -85,8 +85,8 @@ const TOUCH_LEAD=64;
 const SAVE='veilGearSaveV1';let meta=JSON.parse(localStorage.getItem(SAVE)||'{"codex":{},"best":0}');
 const enemies=[
  {id:'wisp',name:'Halo Wisp',hp:32,r:15,speed:38,armor:'none',note:'Tags amplify heavy GEAR shots.'},
- {id:'shell',name:'Aegis Shell',hp:54,r:18,speed:26,armor:'plate',note:'Plate halves GEAR damage until fractured by BURST.'},
- {id:'choir',name:'Choir Needle',hp:40,r:14,speed:44,armor:'veil',note:'Veil reduces SKIRMISH tagging. BURST fractures it.'},
+ {id:'shell',name:'Aegis Shell',hp:54,r:18,speed:26,armor:'plate',note:'Plate halves GEAR damage until a GEAR Drive-release fractures it.'},
+ {id:'choir',name:'Choir Needle',hp:40,r:14,speed:44,armor:'veil',note:'Veil reduces SKIRMISH tagging. A GEAR Drive-release can fracture it.'},
  {id:'lancer',name:'Orbit Lancer',hp:46,r:16,speed:31,armor:'none',note:'Its fan leaves deliberate graze lanes between bullets.'},
  {id:'bell',name:'Vesper Bell',hp:48,r:17,speed:27,armor:'none',note:'Its slow halo rewards staying close enough to graze the ring.'},
  {id:'archon',name:'Pale Archon',hp:210,r:30,speed:18,armor:'adaptive',note:'Alternating forms prevents adaptation from hardening.'}
@@ -143,11 +143,12 @@ function hitEnemy(e,s){
    if(e.armor==='adaptive'){if(e.adapt==='skirmish')gain*=.45;e.adapt='skirmish'}
    e.tag=Math.min(8,e.tag+gain);learn('tag','SKIRMISH fire builds TAG. GEAR detonates it.');
  }else{
-   if(e.armor==='plate'&&!e.fract){d*=.5;fl('PLATE',e.x,e.y-20,'#d9c98c');learn('plate','Plate halves heavy GEAR damage until BURST fractures it.')}
+   if(e.armor==='plate'&&!e.fract){d*=.5;fl('PLATE',e.x,e.y-20,'#d9c98c');learn('plate','Plate halves heavy GEAR damage until a GEAR Drive-release fractures it.')}
    if(e.armor==='adaptive'){if(e.adapt==='gear')d*=.55;e.adapt='gear'}
    if(e.tag>0){let tags=e.tag,bonus=Math.round(tags*4);d+=bonus;fl('DETONATE +'+bonus,e.x,e.y-28,'#ffd27b');if(has('refund'))S.fuel=Math.min(S.mfuel,S.fuel+tags*3);if(has('splash'))S.enemies.forEach(o=>{if(o!==e&&Math.hypot(o.x-e.x,o.y-e.y)<95){let splash=Math.max(1,Math.round(bonus*.35));o.hp-=splash;fl('ECHO -'+splash,o.x,o.y-20,'#ffd27b')}});if(has('refresh')&&tags>=6){e.fract=Math.max(e.fract,1.5);fl('FRACTURE HELD',e.x,e.y-40,'#c9a2ff')}e.tag=0;learn('detonate','GEAR shots cash out TAG as bonus damage.')}
    if(e.fract&&has('fractPierce'))s.pierce=true;
  }
+ if(s.echo&&s.type==='g'){e.fract=Math.max(e.fract,1.8);e.adapt=null;fl('DRIVE FRACTURE',e.x,e.y-40,'#c9a2ff');learn('fracture','A GEAR Drive-release fractures defenses and clears adaptive resistance.')}
  if(e.fract&&has('fracture'))d*=1.25;
  e.hp-=d;part(e.x,e.y,s.type==='s'?'#7fd7ff':'#ffb06a',6);fl('-'+Math.round(d),e.x,e.y-10);
  if(e.hp<=0){S.chain++;S.score+=100+S.chain*10;part(e.x,e.y,'#f3d78a',18);tone(110,.08,.025);S.enemies.splice(S.enemies.indexOf(e),1)}
@@ -195,7 +196,7 @@ function update(dt){
    if(b.x<-20||b.x>W+20||b.y>H+20){S.eshots.splice(S.eshots.indexOf(b),1);continue}
    let d=Math.hypot(b.x-player.x,b.y-player.y),graze=has('graze')?34:29;
    if(d<player.r+b.r){S.eshots.splice(S.eshots.indexOf(b),1);damage(10);continue}
-   if(d<graze&&!b.g){b.g=true;S.chain++;if(S.drive>0){S.echoes=Math.min(S.driveMax,S.echoes+1);S.eshots.splice(S.eshots.indexOf(b),1);part(b.x,b.y,'#c9a2ff',5);fl('ECHO '+S.echoes,player.x,player.y-32,'#c9a2ff');tone(840,.035,.008,'triangle');if(has('burstFuel'))S.fuel=Math.min(S.mfuel,S.fuel+1)}else{S.res=Math.min(100,S.res+4);part(b.x,b.y,'#7fd7ff',3);tone(720,.025,.006);if(has('graze')&&S.chain%8===0)S.hp=Math.min(S.mhp,S.hp+1);learn('graze','Grazing bullets builds Resonance without taking damage.')}}
+   if(d<graze&&!b.g){b.g=true;S.chain++;if(S.drive>0){S.echoes=Math.min(S.driveMax,S.echoes+1);S.eshots.splice(S.eshots.indexOf(b),1);part(b.x,b.y,'#c9a2ff',5);fl('ECHO '+S.echoes,player.x,player.y-32,'#c9a2ff');tone(840,.035,.008,'triangle');if(has('burstFuel'))S.fuel=Math.min(S.mfuel,S.fuel+1)}else{S.res=Math.min(100,S.res+4);part(b.x,b.y,'#7fd7ff',3);tone(720,.025,.006);if(has('graze')&&S.chain%8===0)S.hp=Math.min(S.mhp,S.hp+1);if(has('grazeTag')&&S.chain%3===0&&S.enemies.length){let n=S.enemies.reduce((a,e)=>Math.hypot(e.x-player.x,e.y-player.y)<Math.hypot(a.x-player.x,a.y-player.y)?e:a,S.enemies[0]);n.tag=Math.min(8,n.tag+1);fl('+TAG',n.x,n.y-30,'#7fd7ff')}learn('graze','Grazing bullets builds Resonance without taking damage.')}}
  }
  if(S.mode==='skirmish')S.fuel=Math.min(S.mfuel,S.fuel+10*dt);if(S.drive>0){S.drive=Math.max(0,S.drive-dt);if(S.drive===0){if(S.echoes){let fuel=Math.min(24,S.echoes*2),heal=Math.floor(S.echoes/4);S.fuel=Math.min(S.mfuel,S.fuel+fuel);S.hp=Math.min(S.mhp,S.hp+heal);fl('+'+fuel+' FUEL',player.x,player.y-32,'#e7ba67');if(heal)fl('+'+heal+' HULL',player.x,player.y-46,'#9ee0bb');msg('DRIVE COLLAPSE // unused echoes folded into Fuel'+(heal?' and Hull.':'.'))}S.echoes=0}}
  if(S.score>0&&S.score>=S.wave*900&&!S.boss){S.boss=true;S.enemies=[];S.eshots=[];spawnEnemy(true);msg('PALE ARCHON // something in the machine recognizes it.')}
