@@ -21,3 +21,4 @@ jobs:
           git add games/wip/index.html
           git commit -m 'Add shuffled curriculum and pixel art enemies to GRID BREAKER' || exit 0
           git push
+# trigger
