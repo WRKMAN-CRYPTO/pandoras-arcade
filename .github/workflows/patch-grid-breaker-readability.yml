@@ -24,3 +24,4 @@ jobs:
           git add games/wip/index.html
           git commit -m 'Improve GRID BREAKER readability' || exit 0
           git push
+# trigger
