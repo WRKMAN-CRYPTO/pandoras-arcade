@@ -9,6 +9,10 @@ A growing browser arcade for small games designed through conversation and itera
 
 The arcade is designed mobile-first and hosted as a static site. Each game lives under `games/<game-name>/index.html`, so adding a new cabinet is intentionally simple.
 
+## Project decisions
+
+Durable architectural and maintenance reasoning is recorded in [`docs/DECISIONS.md`](docs/DECISIONS.md).
+
 ## Public-repo note
 
 Brood Brawl is an unofficial fan prototype and uses original procedural artwork/code rather than ripped commercial assets.
