@@ -22,7 +22,7 @@ Current audio language:
 
 - ball vertical position -> melody pitch
 - ball horizontal position -> stereo position
-- ball speed -> melodic pulse rate
+- ball speed -> subtle pressure inside the existing phrase, not pulse frequency
 - player paddle position -> the quiet center inside a soft harmonic field
 - predicted interception alignment -> harmonic stability versus roughness
 - approach -> field presence increases as the interception matters more
@@ -120,6 +120,27 @@ The tuning question is:
 
 **Can the player learn to arrive at the interception point before the ball, rather than chase the ball tone after it?**
 
+## Gauntlet 5: protect the attentional hierarchy
+
+Human testing then found a more subtle failure: the repetition frequency carrying speed was more attention-grabbing than the projected-trajectory language.
+
+That meant a secondary variable was stealing the foreground from the information needed to play well.
+
+This pass removes speed from pulse cadence entirely:
+
+- ball and groove pulse rates are now stable rather than speeding up with velocity,
+- trajectory and projected interception remain the dominant changing structure,
+- speed now produces only a small change in note duration, gain, and field pressure,
+- speed therefore changes the felt urgency of the same phrase without becoming a separately countable signal.
+
+The hierarchy is now intentional:
+
+**trajectory first -> position inside trajectory -> speed as pressure**
+
+The tuning question is:
+
+**Can the player notice that the rally is faster without having attention pulled away from where the ball will arrive?**
+
 ## Battle-test protocol
 
 Do not judge only whether each route is technically playable.
@@ -140,9 +161,10 @@ For the eyes-closed route, add these stronger questions:
 9. can the player sense alignment without mentally naming two pitches,
 10. does good positioning begin to sound more settled before contact,
 11. can the player move ahead of the ball rather than chase its present pitch,
-12. does a miss feel wrong before the player consciously analyzes it,
-13. can the player feel themselves recover the phrase after a mistake,
-14. after practice, does the player want to keep playing specifically to become better at blind Pong?
+12. does speed feel like pressure without becoming the thing attention follows,
+13. does a miss feel wrong before the player consciously analyzes it,
+14. can the player feel themselves recover the phrase after a mistake,
+15. after practice, does the player want to keep playing specifically to become better at blind Pong?
 
 Then compare the routes.
 
@@ -154,7 +176,7 @@ The important question is not whether scores are identical. It is whether the sa
 - The eyes-closed route still uses synthesized Web Audio rather than authored sound assets.
 - The current harmonic language is an experimental grammar, not a finished composition.
 - The CPU opponent is intentionally simple and is not part of the perceptual-equivalence claim.
-- Static implementation can validate architecture and mappings, but perceptual equivalence, fluency, flow, and anticipation require human playtesting.
+- Static implementation can validate architecture and mappings, but perceptual equivalence, fluency, flow, anticipation, and attentional hierarchy require human playtesting.
 
 ## Failure conditions
 
@@ -165,6 +187,7 @@ The experiment fails if:
 - one route quietly receives easier physics,
 - audio narrates the answer instead of exposing game state,
 - multiple signals compete for the same perceptual territory,
+- a secondary variable such as speed steals attention from trajectory,
 - musical feedback becomes decorative and stops carrying mechanical truth,
 - projected-interception harmony makes the correct action trivially automatic rather than learnable,
 - a miss sounds dramatic but does not communicate broken play,
