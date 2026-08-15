@@ -20,15 +20,15 @@ The playfield is intentionally hidden after play begins. The player controls the
 
 Current audio language:
 
-- ball vertical position -> melody pitch
+- ball vertical position -> transposes a recurring four-note melodic contour
 - ball horizontal position -> stereo position
-- ball speed -> no dedicated audio cue in the current ablation build
+- projected interception error -> bends the contour away from or back toward its home shape
 - player paddle position -> the quiet center inside a soft harmonic field
 - predicted interception alignment -> harmonic stability versus roughness
-- approach -> field presence increases as the interception matters more
-- successful paddle contact -> musical resolution and continuation of the phrase
-- miss -> an intentionally wrong PLINK that breaks the phrase
-- recovery -> the coherent field returns and the player can find the groove again
+- time-to-contact -> very small phrase tightening near the player
+- successful paddle contact -> completes and resets the phrase into consonant resolution
+- miss -> an intentionally wrong PLINK that fractures the phrase
+- recovery -> the familiar home contour returns
 
 Headphones are strongly recommended because stereo position carries horizontal state.
 
@@ -102,21 +102,19 @@ The next human test reported that the language was forming, but remained early. 
 
 A key weakness in the previous implementation was that harmonic alignment compared the paddle against the ball's **current** vertical position. That could encourage the player to chase the moving tone instead of learning interception.
 
-This tuning pass changes only the auditory interpretation:
+This tuning pass changed only the auditory interpretation:
 
-- the moving ball tone still represents the ball's current position,
-- the harmonic field now settles according to the ball's **projected vertical interception point** at the player's paddle,
-- wall bounces are folded into that projection,
-- harmonic roughness increases as the paddle moves away from the projected interception path,
-- consonance increases as the paddle approaches it,
-- the field becomes more present as the ball approaches,
-- groove and ball voices were softened so the field has more perceptual room,
+- the moving ball tone still represented the ball's current position,
+- the harmonic field settled according to the ball's **projected vertical interception point** at the player's paddle,
+- wall bounces were folded into that projection,
+- harmonic roughness increased as the paddle moved away from the projected interception path,
+- consonance increased as the paddle approached it,
+- the field became more present as the ball approached,
+- groove and ball voices were softened so the field had more perceptual room,
 - clean contact resolution was extended slightly,
-- the miss PLINK was sharpened and the field collapses a little longer before recovery.
+- the miss PLINK was sharpened and the field collapsed a little longer before recovery.
 
-This does not choose the action for the player. It exposes trajectory through another perceptual language, analogous to seeing where a visible ball is headed.
-
-The tuning question is:
+The tuning question was:
 
 **Can the player learn to arrive at the interception point before the ball, rather than chase the ball tone after it?**
 
@@ -126,40 +124,49 @@ Human testing then found a more subtle failure: the repetition frequency carryin
 
 That meant a secondary variable was stealing the foreground from the information needed to play well.
 
-This pass removed speed from pulse cadence entirely:
-
-- ball and groove pulse rates became stable rather than speeding up with velocity,
-- trajectory and projected interception remained the dominant changing structure,
-- speed produced only a small change in note duration, gain, and field pressure,
-- speed therefore changed the felt urgency of the same phrase without becoming a separately countable signal.
+This pass removed speed from pulse cadence entirely and pushed it underneath trajectory.
 
 The hierarchy became:
 
 **trajectory first -> position inside trajectory -> speed as pressure**
 
-The tuning question was:
-
-**Can the player notice that the rally is faster without having attention pulled away from where the ball will arrive?**
-
 ## Gauntlet 6: speed ablation
 
-The next human test asks a more fundamental question: **is an explicit speed cue necessary at all?**
+The next human test asked a more fundamental question: **is an explicit speed cue necessary at all?**
 
-This build removes dedicated speed sonification from the eyes-closed route.
+The build removed dedicated speed sonification from the eyes-closed route while preserving actual velocity and its physical consequences.
 
-- ball pulse cadence stays fixed,
-- ball-note gain and duration no longer change with velocity,
-- harmonic field strength no longer changes with velocity,
-- trajectory, current position, predicted interception, alignment, contact, miss, and recovery remain intact,
-- physics are unchanged, so a faster ball still physically reaches places sooner and moves farther between successive fixed-cadence position samples.
+The result was useful: the language became cleaner and did not collapse, but the player did not yet perceive speed strongly enough from event spacing alone. Human testing also reported that the body and mind were actively trying to adapt, and that the sounds were beginning to be remembered and replayed as nonverbal patterns rather than verbal labels.
 
-That distinction matters. The experiment removes **explicit speed encoding**, not the real consequence of speed. If the player can still develop timing and mastery from the changing spatial sequence itself, then a separate speed channel may be redundant.
+That exposed a deeper hypothesis: perhaps the language should be memorable as a **shape**, not decoded as a collection of cues.
 
-If performance or felt control degrades in a way trajectory cannot explain, then speed may deserve a dedicated place in the language after all.
+## Gauntlet 7: melodic home shape
 
-The ablation question is:
+This pass stops treating the rally as a set of separately sonified variables and gives it a recurring melodic object.
 
-**When speed says nothing directly, is anything important actually missing?**
+A four-note contour acts as the phrase's **home shape**.
+
+- the ball's vertical position transposes the whole phrase,
+- stereo still carries horizontal position,
+- signed projected-interception error bends the contour away from its home tuning,
+- improved alignment lets the contour return toward its familiar consonant shape,
+- the harmonic field remains underneath as context rather than a second melody,
+- time-to-contact only tightens phrase spacing slightly near interception rather than announcing raw speed,
+- clean contact completes the phrase and resets its contour,
+- a miss deliberately fractures the established expectation,
+- recovery means hearing the recognizable contour return.
+
+The important design shift is:
+
+**Do not ask the player to remember what every sound means. Give the nervous system one memorable shape and let game state deform it.**
+
+This build is specifically testing whether melodic memory can carry perceptual fluency better than a cue-codebook approach.
+
+The human question is:
+
+**Does the player begin to recognize the phrase itself, then feel trajectory and alignment as deformations of something already familiar?**
+
+A stronger success signal would be that the player can hum or internally replay the phrase while also sensing when play is pulling it toward or away from resolution.
 
 ## Battle-test protocol
 
@@ -177,15 +184,16 @@ For each route, test whether a player can:
 
 For the eyes-closed route, add these stronger questions:
 
-8. does the paddle feel like a place in the sound field rather than a second competing object,
-9. can the player sense alignment without mentally naming two pitches,
-10. does good positioning begin to sound more settled before contact,
+8. does the recurring contour become recognizable after several rallies,
+9. can the player feel the contour bending without consciously decoding each note,
+10. does good positioning make the phrase feel more like its remembered home shape,
 11. can the player move ahead of the ball rather than chase its present pitch,
-12. with no dedicated speed cue, does timing remain learnable,
-13. does anything actually feel absent when speed is no longer sonified,
-14. does a miss feel wrong before the player consciously analyzes it,
-15. can the player feel themselves recover the phrase after a mistake,
-16. after practice, does the player want to keep playing specifically to become better at blind Pong?
+12. does near-contact tightening create urgency without stealing attention from trajectory,
+13. does a clean hit feel like musical completion rather than a reward jingle,
+14. does a miss feel structurally wrong because it violates an established expectation,
+15. does recovery feel like getting a known phrase back,
+16. after practice, can the player hum or internally replay the sensory grammar,
+17. after practice, does the player want to keep playing specifically to become better at blind Pong?
 
 Then compare the routes.
 
@@ -195,9 +203,10 @@ The important question is not whether scores are identical. It is whether the sa
 
 - Browser haptic support varies and is limited on iPhone, so haptics are supplemental rather than required.
 - The eyes-closed route still uses synthesized Web Audio rather than authored sound assets.
-- The current harmonic language is an experimental grammar, not a finished composition.
+- The four-note contour is an experimental grammar, not a finished composition.
 - The CPU opponent is intentionally simple and is not part of the perceptual-equivalence claim.
-- Static implementation can validate architecture and mappings, but perceptual equivalence, fluency, flow, anticipation, attentional hierarchy, and speed necessity require human playtesting.
+- The current build has been shaped through one human test loop; equivalence for blind players cannot be claimed without testing with people who actually rely on nonvisual play.
+- Static implementation can validate architecture and mappings, but perceptual equivalence, fluency, memory, and mastery require human playtesting.
 
 ## Failure conditions
 
@@ -207,10 +216,10 @@ The experiment fails if:
 - sound-off play loses actionable timing or direction,
 - one route quietly receives easier physics,
 - audio narrates the answer instead of exposing game state,
+- the melodic contour becomes decorative music unrelated to mechanics,
+- the player memorizes a tune but cannot use its deformation to play,
+- time-to-contact tightening becomes another foreground speed cue,
 - multiple signals compete for the same perceptual territory,
-- a secondary variable such as speed steals attention from trajectory,
-- removing explicit speed makes timing or control materially worse,
-- musical feedback becomes decorative and stops carrying mechanical truth,
 - projected-interception harmony makes the correct action trivially automatic rather than learnable,
 - a miss sounds dramatic but does not communicate broken play,
 - the player can decode the game but never develops instinctive flow,
