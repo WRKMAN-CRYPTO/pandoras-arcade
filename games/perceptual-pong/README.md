@@ -22,7 +22,7 @@ Current audio language:
 
 - ball vertical position -> melody pitch
 - ball horizontal position -> stereo position
-- ball speed -> subtle pressure inside the existing phrase, not pulse frequency
+- ball speed -> no dedicated audio cue in the current ablation build
 - player paddle position -> the quiet center inside a soft harmonic field
 - predicted interception alignment -> harmonic stability versus roughness
 - approach -> field presence increases as the interception matters more
@@ -126,20 +126,40 @@ Human testing then found a more subtle failure: the repetition frequency carryin
 
 That meant a secondary variable was stealing the foreground from the information needed to play well.
 
-This pass removes speed from pulse cadence entirely:
+This pass removed speed from pulse cadence entirely:
 
-- ball and groove pulse rates are now stable rather than speeding up with velocity,
-- trajectory and projected interception remain the dominant changing structure,
-- speed now produces only a small change in note duration, gain, and field pressure,
-- speed therefore changes the felt urgency of the same phrase without becoming a separately countable signal.
+- ball and groove pulse rates became stable rather than speeding up with velocity,
+- trajectory and projected interception remained the dominant changing structure,
+- speed produced only a small change in note duration, gain, and field pressure,
+- speed therefore changed the felt urgency of the same phrase without becoming a separately countable signal.
 
-The hierarchy is now intentional:
+The hierarchy became:
 
 **trajectory first -> position inside trajectory -> speed as pressure**
 
-The tuning question is:
+The tuning question was:
 
 **Can the player notice that the rally is faster without having attention pulled away from where the ball will arrive?**
+
+## Gauntlet 6: speed ablation
+
+The next human test asks a more fundamental question: **is an explicit speed cue necessary at all?**
+
+This build removes dedicated speed sonification from the eyes-closed route.
+
+- ball pulse cadence stays fixed,
+- ball-note gain and duration no longer change with velocity,
+- harmonic field strength no longer changes with velocity,
+- trajectory, current position, predicted interception, alignment, contact, miss, and recovery remain intact,
+- physics are unchanged, so a faster ball still physically reaches places sooner and moves farther between successive fixed-cadence position samples.
+
+That distinction matters. The experiment removes **explicit speed encoding**, not the real consequence of speed. If the player can still develop timing and mastery from the changing spatial sequence itself, then a separate speed channel may be redundant.
+
+If performance or felt control degrades in a way trajectory cannot explain, then speed may deserve a dedicated place in the language after all.
+
+The ablation question is:
+
+**When speed says nothing directly, is anything important actually missing?**
 
 ## Battle-test protocol
 
@@ -161,10 +181,11 @@ For the eyes-closed route, add these stronger questions:
 9. can the player sense alignment without mentally naming two pitches,
 10. does good positioning begin to sound more settled before contact,
 11. can the player move ahead of the ball rather than chase its present pitch,
-12. does speed feel like pressure without becoming the thing attention follows,
-13. does a miss feel wrong before the player consciously analyzes it,
-14. can the player feel themselves recover the phrase after a mistake,
-15. after practice, does the player want to keep playing specifically to become better at blind Pong?
+12. with no dedicated speed cue, does timing remain learnable,
+13. does anything actually feel absent when speed is no longer sonified,
+14. does a miss feel wrong before the player consciously analyzes it,
+15. can the player feel themselves recover the phrase after a mistake,
+16. after practice, does the player want to keep playing specifically to become better at blind Pong?
 
 Then compare the routes.
 
@@ -176,7 +197,7 @@ The important question is not whether scores are identical. It is whether the sa
 - The eyes-closed route still uses synthesized Web Audio rather than authored sound assets.
 - The current harmonic language is an experimental grammar, not a finished composition.
 - The CPU opponent is intentionally simple and is not part of the perceptual-equivalence claim.
-- Static implementation can validate architecture and mappings, but perceptual equivalence, fluency, flow, anticipation, and attentional hierarchy require human playtesting.
+- Static implementation can validate architecture and mappings, but perceptual equivalence, fluency, flow, anticipation, attentional hierarchy, and speed necessity require human playtesting.
 
 ## Failure conditions
 
@@ -188,6 +209,7 @@ The experiment fails if:
 - audio narrates the answer instead of exposing game state,
 - multiple signals compete for the same perceptual territory,
 - a secondary variable such as speed steals attention from trajectory,
+- removing explicit speed makes timing or control materially worse,
 - musical feedback becomes decorative and stops carrying mechanical truth,
 - projected-interception harmony makes the correct action trivially automatic rather than learnable,
 - a miss sounds dramatic but does not communicate broken play,
