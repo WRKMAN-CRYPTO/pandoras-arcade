@@ -24,7 +24,7 @@ Current audio language:
 - ball horizontal position -> stereo position
 - ball speed -> melodic pulse rate
 - player paddle position -> the quiet center inside a soft harmonic field
-- alignment -> harmonic stability versus roughness
+- predicted interception alignment -> harmonic stability versus roughness
 - approach -> field presence increases as the interception matters more
 - successful paddle contact -> musical resolution and continuation of the phrase
 - miss -> an intentionally wrong PLINK that breaks the phrase
@@ -80,7 +80,7 @@ This exposed the distinction between **information equivalence** and **perceptua
 
 Human testing then identified a stronger target through a Guitar Hero analogy: when play is going well, the sensory language should flow. A mistake should feel immediately and musically wrong, and recovery should mean finding the flow again.
 
-This pass treats the rally as one musical phrase rather than a collection of independent cues.
+This pass treated the rally as one musical phrase rather than a collection of independent cues.
 
 - the ball acts as a moving melodic voice,
 - the paddle field provides harmonic context without duplicating the ball's pitch,
@@ -92,11 +92,33 @@ This pass treats the rally as one musical phrase rather than a collection of ind
 - a missed ball triggers a deliberately dissonant PLINK and briefly collapses the field,
 - the field then returns so recovery is perceptible as re-entering the phrase.
 
-The target is no longer merely successful sensory decoding.
+The target became:
 
-**The target is that good play starts to sound right before the player has to explain why.**
+**Good play should start to sound right before the player has to explain why.**
 
-The miss should be felt as a break in coherence, and improvement should include learning how to preserve and recover that coherence.
+## Gauntlet 4: tuning for anticipation
+
+The next human test reported that the language was forming, but remained early. The correct response was tuning rather than adding more systems.
+
+A key weakness in the previous implementation was that harmonic alignment compared the paddle against the ball's **current** vertical position. That could encourage the player to chase the moving tone instead of learning interception.
+
+This tuning pass changes only the auditory interpretation:
+
+- the moving ball tone still represents the ball's current position,
+- the harmonic field now settles according to the ball's **projected vertical interception point** at the player's paddle,
+- wall bounces are folded into that projection,
+- harmonic roughness increases as the paddle moves away from the projected interception path,
+- consonance increases as the paddle approaches it,
+- the field becomes more present as the ball approaches,
+- groove and ball voices were softened so the field has more perceptual room,
+- clean contact resolution was extended slightly,
+- the miss PLINK was sharpened and the field collapses a little longer before recovery.
+
+This does not choose the action for the player. It exposes trajectory through another perceptual language, analogous to seeing where a visible ball is headed.
+
+The tuning question is:
+
+**Can the player learn to arrive at the interception point before the ball, rather than chase the ball tone after it?**
 
 ## Battle-test protocol
 
@@ -117,9 +139,10 @@ For the eyes-closed route, add these stronger questions:
 8. does the paddle feel like a place in the sound field rather than a second competing object,
 9. can the player sense alignment without mentally naming two pitches,
 10. does good positioning begin to sound more settled before contact,
-11. does a miss feel wrong before the player consciously analyzes it,
-12. can the player feel themselves recover the phrase after a mistake,
-13. after practice, does the player want to keep playing specifically to become better at blind Pong?
+11. can the player move ahead of the ball rather than chase its present pitch,
+12. does a miss feel wrong before the player consciously analyzes it,
+13. can the player feel themselves recover the phrase after a mistake,
+14. after practice, does the player want to keep playing specifically to become better at blind Pong?
 
 Then compare the routes.
 
@@ -131,7 +154,7 @@ The important question is not whether scores are identical. It is whether the sa
 - The eyes-closed route still uses synthesized Web Audio rather than authored sound assets.
 - The current harmonic language is an experimental grammar, not a finished composition.
 - The CPU opponent is intentionally simple and is not part of the perceptual-equivalence claim.
-- Static implementation can validate architecture and mappings, but perceptual equivalence, fluency, and flow require human playtesting.
+- Static implementation can validate architecture and mappings, but perceptual equivalence, fluency, flow, and anticipation require human playtesting.
 
 ## Failure conditions
 
@@ -143,6 +166,7 @@ The experiment fails if:
 - audio narrates the answer instead of exposing game state,
 - multiple signals compete for the same perceptual territory,
 - musical feedback becomes decorative and stops carrying mechanical truth,
+- projected-interception harmony makes the correct action trivially automatic rather than learnable,
 - a miss sounds dramatic but does not communicate broken play,
 - the player can decode the game but never develops instinctive flow,
 - the combined route becomes noisier rather than richer,
