@@ -20,14 +20,14 @@ The playfield is intentionally hidden after play begins. The player controls the
 
 Current audio language:
 
-- ball vertical position -> transposes a recurring four-note melodic contour
+- ball vertical position -> transposes a recurring four-note melodic contour inside a compact mid-high register
 - ball horizontal position -> stereo position
 - projected interception error -> bends the contour away from or back toward its home shape
-- player paddle position -> the quiet center inside a soft harmonic field
+- player paddle position -> the quiet center inside a soft harmonic field using the same perceptually strong register
 - predicted interception alignment -> harmonic stability versus roughness
 - time-to-contact -> very small phrase tightening near the player
 - successful paddle contact -> completes and resets the phrase into consonant resolution
-- miss -> an intentionally wrong PLINK that fractures the phrase
+- miss -> an intentionally wrong PLINK inside the same audible register
 - recovery -> the familiar home contour returns
 
 Headphones are strongly recommended because stereo position carries horizontal state.
@@ -142,31 +142,50 @@ That exposed a deeper hypothesis: perhaps the language should be memorable as a 
 
 ## Gauntlet 7: melodic home shape
 
-This pass stops treating the rally as a set of separately sonified variables and gives it a recurring melodic object.
+This pass stopped treating the rally as a set of separately sonified variables and gave it a recurring melodic object.
 
-A four-note contour acts as the phrase's **home shape**.
+A four-note contour acted as the phrase's **home shape**.
 
-- the ball's vertical position transposes the whole phrase,
-- stereo still carries horizontal position,
-- signed projected-interception error bends the contour away from its home tuning,
-- improved alignment lets the contour return toward its familiar consonant shape,
-- the harmonic field remains underneath as context rather than a second melody,
-- time-to-contact only tightens phrase spacing slightly near interception rather than announcing raw speed,
-- clean contact completes the phrase and resets its contour,
-- a miss deliberately fractures the established expectation,
-- recovery means hearing the recognizable contour return.
+- the ball's vertical position transposed the whole phrase,
+- stereo still carried horizontal position,
+- signed projected-interception error bent the contour away from its home tuning,
+- improved alignment let the contour return toward its familiar consonant shape,
+- the harmonic field remained underneath as context rather than a second melody,
+- time-to-contact only tightened phrase spacing slightly near interception rather than announcing raw speed,
+- clean contact completed the phrase and reset its contour,
+- a miss deliberately fractured the established expectation,
+- recovery meant hearing the recognizable contour return.
 
-The important design shift is:
+The important design shift was:
 
 **Do not ask the player to remember what every sound means. Give the nervous system one memorable shape and let game state deform it.**
 
-This build is specifically testing whether melodic memory can carry perceptual fluency better than a cue-codebook approach.
+Human testing exposed a new failure: the low and high portions of the phrase did not have comparable perceptual weight. Low frequencies barely registered compared with the higher material, so the phrase did not feel like one coherent object even when its mathematical relationships were correct.
 
-The human question is:
+## Gauntlet 8: palette reset
 
-**Does the player begin to recognize the phrase itself, then feel trajectory and alignment as deformations of something already familiar?**
+This pass backs up one layer. It does not add grammar. It repairs the instrument palette first.
 
-A stronger success signal would be that the player can hum or internally replay the phrase while also sensing when play is pulling it toward or away from resolution.
+The central hypothesis is:
+
+**A sensory mapping is not equivalent merely because its mathematics are symmetrical. Its perceptual weight must also be usable.**
+
+Changes:
+
+- the playable melodic range is compressed upward into a compact mid-high band,
+- the four-note home contour uses much smaller intervals so no note escapes into a weak register,
+- the ball voice switches from pure sine to a brighter triangle tone for stronger presence,
+- paddle-field rails stay close to the same register instead of relying on a low foundation,
+- the groove no longer drops an octave below the paddle,
+- hit, wall, miss, score, and recovery cues are rebuilt around the same audible band,
+- no cue is allowed to depend on sub-bass or very low fundamentals,
+- physics, controls, scoring, trajectory projection, and visual play remain unchanged.
+
+The question is deliberately simpler than the last one:
+
+**Do the sounds finally feel like members of the same family, with comparable authority in the ear?**
+
+Only after that succeeds should the melodic grammar be judged again.
 
 ## Battle-test protocol
 
@@ -184,16 +203,18 @@ For each route, test whether a player can:
 
 For the eyes-closed route, add these stronger questions:
 
-8. does the recurring contour become recognizable after several rallies,
-9. can the player feel the contour bending without consciously decoding each note,
-10. does good positioning make the phrase feel more like its remembered home shape,
-11. can the player move ahead of the ball rather than chase its present pitch,
-12. does near-contact tightening create urgency without stealing attention from trajectory,
-13. does a clean hit feel like musical completion rather than a reward jingle,
-14. does a miss feel structurally wrong because it violates an established expectation,
-15. does recovery feel like getting a known phrase back,
-16. after practice, can the player hum or internally replay the sensory grammar,
-17. after practice, does the player want to keep playing specifically to become better at blind Pong?
+8. do low-versus-high notes now have comparable perceptual presence,
+9. does the entire palette feel like one coherent family,
+10. can the recurring contour become recognizable without one register disappearing,
+11. can the player feel the contour bending without consciously decoding each note,
+12. does good positioning make the phrase feel more like its remembered home shape,
+13. can the player move ahead of the ball rather than chase its present pitch,
+14. does near-contact tightening create urgency without stealing attention from trajectory,
+15. does a clean hit feel like musical completion rather than a reward jingle,
+16. does a miss feel structurally wrong because it violates an established expectation,
+17. does recovery feel like getting a known phrase back,
+18. after practice, can the player hum or internally replay the sensory grammar,
+19. after practice, does the player want to keep playing specifically to become better at blind Pong?
 
 Then compare the routes.
 
@@ -204,6 +225,7 @@ The important question is not whether scores are identical. It is whether the sa
 - Browser haptic support varies and is limited on iPhone, so haptics are supplemental rather than required.
 - The eyes-closed route still uses synthesized Web Audio rather than authored sound assets.
 - The four-note contour is an experimental grammar, not a finished composition.
+- The compact register is tuned from one human playtester's report and is not a universal hearing profile.
 - The CPU opponent is intentionally simple and is not part of the perceptual-equivalence claim.
 - The current build has been shaped through one human test loop; equivalence for blind players cannot be claimed without testing with people who actually rely on nonvisual play.
 - Static implementation can validate architecture and mappings, but perceptual equivalence, fluency, memory, and mastery require human playtesting.
@@ -217,6 +239,7 @@ The experiment fails if:
 - one route quietly receives easier physics,
 - audio narrates the answer instead of exposing game state,
 - the melodic contour becomes decorative music unrelated to mechanics,
+- important notes have radically unequal perceptual weight,
 - the player memorizes a tune but cannot use its deformation to play,
 - time-to-contact tightening becomes another foreground speed cue,
 - multiple signals compete for the same perceptual territory,
