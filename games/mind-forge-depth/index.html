@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+<meta name="theme-color" content="#101316" />
+<title>MIND//FORGE 0.6 · BEND THE SPACE</title>
+<style>
+:root{--bg:#090c0e;--panel:#151b1f;--panel2:#101518;--line:#334149;--ink:#f0f4f5;--muted:#a4b0b6;--hot:#ff7568;--cold:#68b7ff;--accent:#dce56d;--good:#7de2a3;--warn:#f3c86d}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% -15%,#27333a,#101519 42%,#080a0b);color:var(--ink);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}body{padding:max(10px,env(safe-area-inset-top)) 12px max(18px,env(safe-area-inset-bottom))}.app{max-width:600px;margin:auto;display:grid;gap:11px}.card{background:linear-gradient(180deg,#1b2328,#11171a);border:1px solid #2f3a40;border-radius:20px;overflow:hidden}.pad{padding:15px}.brand{display:flex;justify-content:space-between;align-items:end;padding:3px 2px}.brand b{font-size:22px;letter-spacing:.08em}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.19em;margin-top:3px}.badge{font-size:11px;border:1px solid #3c494f;border-radius:999px;padding:7px 10px;color:#ced6da}.eyebrow{color:var(--accent);font-size:10px;letter-spacing:.22em;font-weight:900}.title{font-size:27px;margin:5px 0 6px}.copy{font-size:13px;color:#c6d0d4;line-height:1.45}.stageTabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}.stageTabs button,.btn{border:1px solid #3a474d;background:linear-gradient(#2d373c,#20272b);color:#f5f8f9;border-radius:12px;min-height:48px;font-weight:900;letter-spacing:.04em}.stageTabs button.active,.btn.primary{background:linear-gradient(#dfe873,#aeb84c);color:#15190a;border-color:#ebf18e}.stageTabs button.locked{opacity:.28}.world{display:grid;gap:9px}.plot{position:relative;background:#0b1012;border:1px solid #303b41;border-radius:15px;overflow:hidden}.plot canvas{display:block;width:100%;height:300px}.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--muted)}.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}.hot{background:var(--hot)}.cold{background:var(--cold)}.status{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.stat{background:#0e1417;border:1px solid #2c373d;border-radius:12px;padding:10px}.stat span{display:block;font-size:9px;color:#89979e;letter-spacing:.14em;text-transform:uppercase}.stat b{display:block;margin-top:4px;font-size:16px;font-variant-numeric:tabular-nums}.controls{display:grid;gap:9px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.btn{padding:11px}.btn:disabled{opacity:.3}.story{min-height:66px;background:#0f1518;border:1px solid #29343a;border-radius:13px;padding:11px 12px;color:#c7d0d4;font-size:12px;line-height:1.45}.transform{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:5px;font-size:11px;color:#9facb2;text-align:center}.node{background:#101619;border:1px solid #2f3c42;padding:9px 5px;border-radius:10px;color:#eef3f4;font-weight:850}.arrow{color:var(--accent)}.final{display:none;text-align:center;padding:18px}.final.show{display:block}.stamp{display:inline-block;border:3px solid var(--good);color:var(--good);font-size:24px;font-weight:950;letter-spacing:.12em;padding:9px 13px;border-radius:10px;transform:rotate(-3deg);margin:11px}.drawer details{border-top:1px solid #29343a}.drawer details:first-child{border-top:0}.drawer summary{padding:13px 15px;list-style:none;font-weight:900}.drawer summary::-webkit-details-marker{display:none}.codex{padding:0 15px 15px;color:#bec9cd;font-size:12px;line-height:1.5}.codex b{color:#f0f4f5}.mini{text-align:center;color:#818d93;font-size:10px;padding:4px}.pulse{animation:pulse .55s ease}@keyframes pulse{50%{transform:scale(1.012);filter:brightness(1.2)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="brand"><div><b>MIND//FORGE</b><small>0.6 · BEND THE SPACE</small></div><div class="badge" id="badge">STAGE 1/3</div></header>
+  <section class="card pad">
+    <div class="eyebrow">WORK ORDER</div>
+    <h1 class="title" id="title">Watch the world change.</h1>
+    <div class="copy" id="copy">The raw pattern is tangled. This network has two hidden stages. Train it, then inspect the same points inside each stage.</div>
+    <div class="stageTabs">
+      <button id="rawTab" class="active">RAW WORLD</button>
+      <button id="h1Tab" class="locked">HIDDEN 1</button>
+      <button id="h2Tab" class="locked">HIDDEN 2</button>
+    </div>
+  </section>
+  <section class="card pad world">
+    <div class="plot"><canvas id="plot" width="720" height="600"></canvas></div>
+    <div class="legend"><span><i class="hot"></i>RED</span><span><i class="cold"></i>BLUE</span><span>◌ point position changes with representation</span></div>
+    <div class="status"><div class="stat"><span>accuracy</span><b id="acc">50%</b></div><div class="stat"><span>loss</span><b id="loss">0.693</b></div><div class="stat"><span>steps</span><b id="steps">0</b></div></div>
+  </section>
+  <section class="card pad controls">
+    <div class="transform"><div class="node">RAW X,Y</div><div class="arrow">→</div><div class="node">HIDDEN 1</div><div class="arrow">→</div><div class="node">HIDDEN 2</div></div>
+    <div class="story" id="story">Before training, the hidden spaces are mostly meaningless. Let the network adjust itself.</div>
+    <div class="actions"><button class="btn" id="stepBtn">TRAIN 50</button><button class="btn primary" id="autoBtn">TRAIN UNTIL CLEAR</button></div>
+    <button class="btn" id="revealBtn" disabled>UNLOCK HIDDEN SPACES</button>
+  </section>
+  <section class="card final" id="finalCard">
+    <div class="eyebrow">FINAL INSPECTION</div><h2>The separator becomes simple.</h2>
+    <p class="copy">Fresh points follow the same physical pattern. The network must classify them after transforming them through both hidden stages.</p>
+    <button class="btn primary" id="finalBtn">RUN UNKNOWN BATCH</button><div id="finalResult"></div>
+  </section>
+  <section class="card drawer"><details><summary>DISCOVERY CODEX</summary><div class="codex" id="codex">Nothing named yet. Train first, then inspect what changed.</div></details></section>
+  <div class="mini">No server. No model API. A real 2→3→2→1 neural network runs locally.</div>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id), c=$('plot'),ctx=c.getContext('2d');
+const TRAIN=[];
+for(let i=0;i<28;i++){
+  const a=i/28*Math.PI*2;
+  const r=i%2===0?0.42+0.04*Math.sin(i*1.7):0.83+0.05*Math.cos(i*1.3);
+  TRAIN.push({x:Math.cos(a)*r,y:Math.sin(a)*r,t:i%2===0?1:0});
+}
+const TEST=[];
+for(let i=0;i<16;i++){
+  const a=(i+.43)/16*Math.PI*2;
+  const inner=i%2===0;
+  const r=inner?0.46+0.035*Math.cos(i*1.9):0.80+0.04*Math.sin(i*1.4);
+  TEST.push({x:Math.cos(a)*r,y:Math.sin(a)*r,t:inner?1:0});
+}
+function rand(){return (Math.random()*2-1)*.9}
+let W1=Array.from({length:3},()=>[rand(),rand()]),b1=[rand(),rand(),rand()];
+let W2=Array.from({length:2},()=>[rand(),rand(),rand()]),b2=[rand(),rand()];
+let Wo=[rand(),rand()],bo=rand();
+let mode='raw',steps=0,unlocked=false,auto=null;
+const sig=z=>1/(1+Math.exp(-z));
+function f(p){
+ const h1=W1.map((w,j)=>Math.tanh(w[0]*p.x+w[1]*p.y+b1[j]));
+ const h2=W2.map((w,j)=>Math.tanh(w[0]*h1[0]+w[1]*h1[1]+w[2]*h1[2]+b2[j]));
+ const z=Wo[0]*h2[0]+Wo[1]*h2[1]+bo,pred=sig(z);
+ return {h1,h2,p:pred};
+}
+function metrics(data=TRAIN){let ok=0,L=0;for(const p of data){const q=Math.min(.999999,Math.max(.000001,f(p).p));ok+=(q>=.5)==p.t;L+=-(p.t*Math.log(q)+(1-p.t)*Math.log(1-q));}return{acc:ok/data.length,loss:L/data.length}}
+function trainOne(lr=.08){
+ let gW1=W1.map(()=>[0,0]),gb1=[0,0,0],gW2=W2.map(()=>[0,0,0]),gb2=[0,0],gWo=[0,0],gbo=0;
+ for(const p of TRAIN){
+  const o=f(p),dz=o.p-p.t;
+  gWo[0]+=dz*o.h2[0];gWo[1]+=dz*o.h2[1];gbo+=dz;
+  const dh2=[dz*Wo[0]*(1-o.h2[0]**2),dz*Wo[1]*(1-o.h2[1]**2)];
+  for(let j=0;j<2;j++){for(let k=0;k<3;k++)gW2[j][k]+=dh2[j]*o.h1[k];gb2[j]+=dh2[j];}
+  const dh1=[0,1,2].map(k=>(dh2[0]*W2[0][k]+dh2[1]*W2[1][k])*(1-o.h1[k]**2));
+  for(let k=0;k<3;k++){gW1[k][0]+=dh1[k]*p.x;gW1[k][1]+=dh1[k]*p.y;gb1[k]+=dh1[k];}
+ }
+ const n=TRAIN.length;
+ for(let k=0;k<3;k++){W1[k][0]-=lr*gW1[k][0]/n;W1[k][1]-=lr*gW1[k][1]/n;b1[k]-=lr*gb1[k]/n}
+ for(let j=0;j<2;j++){for(let k=0;k<3;k++)W2[j][k]-=lr*gW2[j][k]/n;b2[j]-=lr*gb2[j]/n}
+ Wo[0]-=lr*gWo[0]/n;Wo[1]-=lr*gWo[1]/n;bo-=lr*gbo/n;steps++;
+}
+function coords(p){const o=f(p);if(mode==='raw')return[p.x,p.y];if(mode==='h1')return[o.h1[0],o.h1[1]];return[o.h2[0],o.h2[1]]}
+function draw(){
+ const W=c.width,H=c.height;ctx.clearRect(0,0,W,H);ctx.fillStyle='#0b1012';ctx.fillRect(0,0,W,H);
+ ctx.strokeStyle='#223038';ctx.lineWidth=1;for(let i=1;i<10;i++){ctx.beginPath();ctx.moveTo(i*W/10,0);ctx.lineTo(i*W/10,H);ctx.stroke();ctx.beginPath();ctx.moveTo(0,i*H/10);ctx.lineTo(W,i*H/10);ctx.stroke();}
+ const pts=TRAIN.map(p=>({p,xy:coords(p)}));let max=1;for(const q of pts)max=Math.max(max,Math.abs(q.xy[0]),Math.abs(q.xy[1]));
+ for(const q of pts){const x=W/2+q.xy[0]/max*W*.4,y=H/2-q.xy[1]/max*H*.4;ctx.beginPath();ctx.arc(x,y,9,0,Math.PI*2);ctx.fillStyle=q.p.t?'#ff7568':'#68b7ff';ctx.fill();ctx.strokeStyle='#eaf0f255';ctx.stroke();}
+ const m=metrics();$('acc').textContent=Math.round(m.acc*100)+'%';$('loss').textContent=m.loss.toFixed(3);$('steps').textContent=steps;
+ if(m.acc>=.96 && m.loss<.16){$('revealBtn').disabled=false;$('story').textContent='The output is strong now. Do not stop at the score. Open the machine and inspect what the hidden stages did to the geometry.';}
+}
+function setMode(m){if(m!=='raw'&&!unlocked)return;mode=m;['raw','h1','h2'].forEach(x=>$(x+'Tab').classList.toggle('active',x===m));c.classList.remove('pulse');void c.offsetWidth;c.classList.add('pulse');draw();if(m==='raw')$('story').textContent='This is the physical world. Inner and outer rings are tangled around a center.';if(m==='h1')$('story').textContent='Hidden 1 stretches and folds the raw coordinates into three learned signals. You are viewing two of them.';if(m==='h2')$('story').textContent='Hidden 2 compresses those signals again. Notice whether red and blue now occupy regions a simple output neuron can separate.';}
+$('rawTab').onclick=()=>setMode('raw');$('h1Tab').onclick=()=>setMode('h1');$('h2Tab').onclick=()=>setMode('h2');
+$('stepBtn').onclick=()=>{for(let i=0;i<50;i++)trainOne();draw()};
+$('autoBtn').onclick=()=>{if(auto){clearInterval(auto);auto=null;$('autoBtn').textContent='TRAIN UNTIL CLEAR';return}$('autoBtn').textContent='PAUSE';auto=setInterval(()=>{for(let i=0;i<40;i++)trainOne();draw();const m=metrics();if((m.acc>=.96&&m.loss<.12)||steps>12000){clearInterval(auto);auto=null;$('autoBtn').textContent='TRAINED';}},20)};
+$('revealBtn').onclick=()=>{unlocked=true;$('h1Tab').classList.remove('locked');$('h2Tab').classList.remove('locked');$('revealBtn').textContent='HIDDEN SPACES UNLOCKED';$('revealBtn').disabled=true;$('badge').textContent='STAGE 2/3';$('title').textContent='The network changed coordinates.';$('copy').textContent='The points did not move in the real world. Their internal representation moved. Inspect both hidden stages.';$('codex').innerHTML='<b>Representation learning:</b> hidden layers can learn new coordinates instead of relying on hand-designed features.<br><br><b>Depth:</b> each stage transforms the representation produced by the previous stage.<br><br><b>Decision geometry:</b> a difficult shape in raw space can become simple in a learned hidden space.';$('finalCard').classList.add('show');};
+$('finalBtn').onclick=()=>{const m=metrics(TEST),ok=m.acc>=.875;$('finalResult').innerHTML=`<div class="stamp">${ok?'NETWORK PASSES':'RETRAIN'}</div><p class="copy"><b>${Math.round(m.acc*TEST.length)} / ${TEST.length}</b> unseen points correct.</p><p class="copy">${ok?'The raw rings were awkward for a straight decision. The hidden layers learned a representation in which the final decision became much simpler.':'The internal geometry is not stable enough yet. Train longer, then inspect the hidden spaces again.'}</p>`;if(ok){$('badge').textContent='STAGE 3/3';$('title').textContent='Shape can be learned.';}};
+draw();
+})();
+</script>
+</body></html>
