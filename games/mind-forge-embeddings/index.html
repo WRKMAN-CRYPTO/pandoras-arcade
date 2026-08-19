@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#101316">
+<title>MIND//FORGE 0.7 · WORDS BECOME PLACES</title>
+<style>
+:root{--bg:#090c0e;--panel:#151b1f;--panel2:#0e1417;--line:#334149;--ink:#f1f5f6;--muted:#a7b2b7;--accent:#dce66e;--good:#7ee2a3;--bad:#ff7568;--blue:#68b7ff;--violet:#b68cff;--orange:#ffad68}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% -15%,#28343b,#101519 42%,#080a0b);color:var(--ink);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{padding:max(10px,env(safe-area-inset-top)) 12px max(18px,env(safe-area-inset-bottom))}
+.app{max-width:600px;margin:auto;display:grid;gap:11px}
+.brand{display:flex;justify-content:space-between;align-items:end;padding:3px 2px}.brand b{font-size:22px;letter-spacing:.08em}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.18em;margin-top:3px}.badge{font-size:11px;border:1px solid #3b474d;border-radius:999px;padding:7px 10px;color:#d0d8dc}
+.card{background:linear-gradient(180deg,#1b2328,#11171a);border:1px solid #2f3a40;border-radius:20px;overflow:hidden}.pad{padding:15px}
+.eyebrow{font-size:10px;letter-spacing:.22em;color:var(--accent);font-weight:900}.title{font-size:28px;margin:5px 0 6px}.copy{font-size:13px;line-height:1.48;color:#c7d0d4;margin:0}
+.plot{position:relative;background:#0a0f11;border:1px solid #303b41;border-radius:15px;overflow:hidden}.plot canvas{display:block;width:100%;height:360px;touch-action:manipulation}
+.legend{display:flex;flex-wrap:wrap;gap:9px;margin-top:8px;font-size:10px;color:#919fa6}.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}.stat{background:#0e1417;border:1px solid #2b363c;border-radius:12px;padding:10px}.stat span{display:block;color:#85939a;font-size:9px;text-transform:uppercase;letter-spacing:.13em}.stat b{display:block;margin-top:4px;font-size:16px;font-variant-numeric:tabular-nums}
+.story{background:#0e1417;border:1px solid #29343a;border-radius:13px;padding:11px 12px;font-size:12px;line-height:1.45;color:#c4ced2;min-height:62px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}.btn{border:1px solid #3a474d;background:linear-gradient(#2c363b,#20272b);color:#f4f7f8;border-radius:12px;min-height:50px;padding:10px;font-weight:900;letter-spacing:.035em}.btn.primary{background:linear-gradient(#dfe873,#aeb84c);color:#15190a;border-color:#eaf18b}.btn:disabled{opacity:.3}.wide{width:100%;margin-top:8px}
+.inspector{display:none}.inspector.show{display:block}.inspectHead{display:flex;justify-content:space-between;align-items:center;gap:8px}.nearest{display:grid;gap:7px;margin-top:10px}.neighbor{display:flex;justify-content:space-between;align-items:center;background:#0d1316;border:1px solid #29343a;border-radius:11px;padding:9px 10px;font-size:12px}.neighbor b{letter-spacing:.06em}.neighbor span{font-variant-numeric:tabular-nums;color:#aab6bb}
+.final{display:none;text-align:center}.final.show{display:block}.stamp{display:inline-block;border:3px solid var(--good);color:var(--good);font-size:24px;font-weight:950;letter-spacing:.11em;padding:9px 13px;border-radius:10px;transform:rotate(-3deg);margin:12px}
+.pairs{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px;text-align:left}.pair{background:#0e1417;border:1px solid #2b363c;border-radius:11px;padding:9px;font-size:11px}.pair.ok{border-color:#47735a}.pair b{display:block}.pair span{color:#97a5ab}
+.drawer details{border-top:1px solid #29343a}.drawer details:first-child{border-top:0}.drawer summary{padding:13px 15px;list-style:none;font-weight:900}.drawer summary::-webkit-details-marker{display:none}.codex{padding:0 15px 15px;color:#bdc8cd;font-size:12px;line-height:1.5}.codex b{color:#f0f4f5}
+.mini{text-align:center;color:#818d93;font-size:10px;padding:4px}
+@media(max-width:420px){.plot canvas{height:330px}.title{font-size:25px}.pairs{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="brand"><div><b>MIND//FORGE</b><small>0.7 · WORDS BECOME PLACES</small></div><div class="badge" id="badge">STAGE 1/3</div></header>
+
+<section class="card pad">
+<div class="eyebrow">WORK ORDER</div>
+<h1 class="title" id="title">Meaning has no coordinates.</h1>
+<p class="copy" id="copy">The machine begins with sixteen words at arbitrary positions. It receives only relationship tickets: words that appear in similar neighborhoods should move closer; unrelated neighborhoods should stay apart.</p>
+</section>
+
+<section class="card pad">
+<div class="plot"><canvas id="plot" width="720" height="650" aria-label="Learned word embedding map"></canvas></div>
+<div class="legend"><span><i style="background:var(--bad)"></i>royal</span><span><i style="background:var(--blue)"></i>animals</span><span><i style="background:var(--good)"></i>fruit</span><span><i style="background:var(--orange)"></i>tools</span></div>
+<div class="stats"><div class="stat"><span>neighbor score</span><b id="score">—</b></div><div class="stat"><span>relation loss</span><b id="loss">—</b></div><div class="stat"><span>steps</span><b id="steps">0</b></div></div>
+</section>
+
+<section class="card pad">
+<div class="story" id="story">At the start, the coordinates mean nothing. Train the embedding and watch whether neighborhoods emerge.</div>
+<div class="actions"><button class="btn" id="stepBtn">TRAIN 50</button><button class="btn primary" id="autoBtn">TRAIN UNTIL CLEAR</button></div>
+<button class="btn wide" id="inspectBtn" disabled>OPEN NEIGHBORHOOD INSPECTOR</button>
+</section>
+
+<section class="card pad inspector" id="inspector">
+<div class="inspectHead"><div><div class="eyebrow">NEIGHBORHOOD INSPECTOR</div><h2 id="selectedWord" style="margin:4px 0">Tap a word</h2></div><div class="badge">tap map</div></div>
+<p class="copy">The closest words are determined only by distance in the learned embedding.</p>
+<div class="nearest" id="nearest"></div>
+</section>
+
+<section class="card pad final" id="final">
+<div class="eyebrow">FINAL INSPECTION</div>
+<h2 style="font-size:27px;margin:6px 0">Relations the machine never saw.</h2>
+<p class="copy">Eight word pairs were deliberately withheld from training. The test asks whether shared neighborhoods placed each withheld partner closer than any unrelated word.</p>
+<button class="btn primary wide" id="finalBtn">RUN WITHHELD RELATIONS</button>
+<div id="finalResult"></div>
+<div class="pairs" id="pairResults"></div>
+</section>
+
+<section class="card drawer"><details><summary>DISCOVERY CODEX</summary><div class="codex" id="codex">Nothing named yet. Let the words move first.</div></details></section>
+<div class="mini">No server. No model API. A real 2D embedding is optimized locally from relationship constraints.</div>
+</div>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id), c=$('plot'),ctx=c.getContext('2d');
+const WORDS=['KING','QUEEN','PRINCE','PRINCESS','DOG','CAT','WOLF','FOX','APPLE','PEAR','BANANA','ORANGE','HAMMER','WRENCH','SAW','DRILL'];
+const GROUPS=[WORDS.slice(0,4),WORDS.slice(4,8),WORDS.slice(8,12),WORDS.slice(12,16)];
+const COLORS=['#ff7568','#68b7ff','#7ee2a3','#ffad68'];
+const group={};GROUPS.forEach((g,i)=>g.forEach(w=>group[w]=i));
+const heldout=[['KING','PRINCESS'],['QUEEN','PRINCE'],['DOG','FOX'],['CAT','WOLF'],['APPLE','ORANGE'],['PEAR','BANANA'],['HAMMER','DRILL'],['WRENCH','SAW']];
+const hkey=(a,b)=>[a,b].sort().join('|'), HELD=new Set(heldout.map(p=>hkey(...p)));
+const positives=[];
+for(const g of GROUPS)for(let i=0;i<g.length;i++)for(let j=i+1;j<g.length;j++)if(!HELD.has(hkey(g[i],g[j])))positives.push([g[i],g[j]]);
+const negatives=[];
+for(let i=0;i<WORDS.length;i++)for(let j=i+1;j<WORDS.length;j++)if(group[WORDS[i]]!==group[WORDS[j]])negatives.push([WORDS[i],WORDS[j]]);
+let seed=9137;const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+const E={};WORDS.forEach(w=>E[w]=[(rnd()*2-1)*1.4,(rnd()*2-1)*1.4]);
+let steps=0,auto=null,unlocked=false,selected=null;
+function dist(a,b){return Math.hypot(E[a][0]-E[b][0],E[a][1]-E[b][1])}
+function trainOne(lr=.025,margin=1.7,target=.34){
+ const G={};WORDS.forEach(w=>G[w]=[0,0]);let L=0;
+ for(const [a,b] of positives){
+  const dx=E[a][0]-E[b][0],dy=E[a][1]-E[b][1],d=Math.max(1e-6,Math.hypot(dx,dy)),q=d-target,k=q/d;
+  L+=.5*q*q;G[a][0]+=k*dx;G[a][1]+=k*dy;G[b][0]-=k*dx;G[b][1]-=k*dy;
+ }
+ const nw=.08;
+ for(const [a,b] of negatives){
+  const dx=E[a][0]-E[b][0],dy=E[a][1]-E[b][1],d=Math.max(1e-6,Math.hypot(dx,dy));
+  if(d<margin){const q=margin-d,k=-nw*q/d;L+=nw*.5*q*q;G[a][0]+=k*dx;G[a][1]+=k*dy;G[b][0]-=k*dx;G[b][1]-=k*dy}
+ }
+ for(const w of WORDS){E[w][0]-=lr*G[w][0];E[w][1]-=lr*G[w][1]}
+ let mx=0,my=0;for(const w of WORDS){mx+=E[w][0];my+=E[w][1]}mx/=WORDS.length;my/=WORDS.length;
+ for(const w of WORDS){E[w][0]-=mx;E[w][1]-=my}
+ steps++;return L;
+}
+function relationLoss(){
+ let L=0;const margin=1.7,target=.34;
+ for(const [a,b] of positives){const q=dist(a,b)-target;L+=.5*q*q}
+ for(const [a,b] of negatives){const d=dist(a,b);if(d<margin){const q=margin-d;L+=.08*.5*q*q}}
+ return L;
+}
+function nearest(w){return WORDS.filter(v=>v!==w).map(v=>({w:v,d:dist(w,v)})).sort((a,b)=>a.d-b.d)}
+function neighborScore(){
+ let good=0,total=0;
+ for(const w of WORDS)for(const q of nearest(w).slice(0,3)){total++;if(group[w]===group[q.w])good++}
+ return good/total;
+}
+function fit(){
+ let max=1;for(const w of WORDS)max=Math.max(max,Math.abs(E[w][0]),Math.abs(E[w][1]));return max*1.18;
+}
+function xy(w){
+ const m=fit(),W=c.width,H=c.height;return [W/2+E[w][0]/m*W*.44,H/2-E[w][1]/m*H*.44];
+}
+function draw(){
+ const W=c.width,H=c.height;ctx.clearRect(0,0,W,H);ctx.fillStyle='#0a0f11';ctx.fillRect(0,0,W,H);
+ ctx.strokeStyle='#213038';ctx.lineWidth=1;for(let i=1;i<10;i++){ctx.beginPath();ctx.moveTo(i*W/10,0);ctx.lineTo(i*W/10,H);ctx.stroke();ctx.beginPath();ctx.moveTo(0,i*H/10);ctx.lineTo(W,i*H/10);ctx.stroke()}
+ if(steps>0){ctx.lineWidth=1.5;for(const [a,b] of positives){const A=xy(a),B=xy(b);ctx.strokeStyle='#dce66e25';ctx.beginPath();ctx.moveTo(...A);ctx.lineTo(...B);ctx.stroke()}}
+ ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='800 19px ui-sans-serif,-apple-system';
+ for(const w of WORDS){
+  const [x,y]=xy(w),sel=w===selected;ctx.beginPath();ctx.arc(x,y,sel?31:27,0,Math.PI*2);ctx.fillStyle=COLORS[group[w]]+'30';ctx.fill();ctx.strokeStyle=sel?'#f5f8f9':COLORS[group[w]];ctx.lineWidth=sel?3:2;ctx.stroke();ctx.fillStyle='#f2f5f6';ctx.font=(w.length>6?'700 13px':'800 15px')+' ui-sans-serif,-apple-system';ctx.fillText(w,x,y);
+ }
+ const s=neighborScore(),L=relationLoss();$('score').textContent=Math.round(s*100)+'%';$('loss').textContent=L.toFixed(3);$('steps').textContent=steps;
+ if(s>=.95&&L<.03&&!unlocked){$('inspectBtn').disabled=false;$('story').textContent='The neighborhoods are now coherent. Do not stop at the score. Tap into the map and inspect what distance has come to mean.'}
+}
+function inspect(w){
+ selected=w;draw();$('selectedWord').textContent=w;const n=nearest(w).slice(0,4);$('nearest').innerHTML=n.map((q,i)=>`<div class="neighbor"><b>${i+1}. ${q.w}</b><span>distance ${q.d.toFixed(2)}</span></div>`).join('');
+}
+c.addEventListener('pointerup',e=>{
+ if(!unlocked)return;const r=c.getBoundingClientRect(),sx=c.width/r.width,sy=c.height/r.height,x=(e.clientX-r.left)*sx,y=(e.clientY-r.top)*sy;
+ let best=null,bd=1e9;for(const w of WORDS){const [wx,wy]=xy(w),d=Math.hypot(x-wx,y-wy);if(d<bd){bd=d;best=w}}
+ if(best&&bd<50)inspect(best);
+});
+$('stepBtn').onclick=()=>{for(let i=0;i<50;i++)trainOne();draw()};
+$('autoBtn').onclick=()=>{
+ if(auto){clearInterval(auto);auto=null;$('autoBtn').textContent='TRAIN UNTIL CLEAR';return}
+ $('autoBtn').textContent='PAUSE';
+ auto=setInterval(()=>{for(let i=0;i<35;i++)trainOne();draw();if((neighborScore()>=.99&&relationLoss()<.01)||steps>5000){clearInterval(auto);auto=null;$('autoBtn').textContent='TRAINED'}},22);
+};
+$('inspectBtn').onclick=()=>{
+ unlocked=true;$('inspector').classList.add('show');$('final').classList.add('show');$('inspectBtn').disabled=true;$('inspectBtn').textContent='NEIGHBORHOODS UNLOCKED';$('badge').textContent='STAGE 2/3';$('title').textContent='Words became locations.';$('copy').textContent='No dictionary definition was stored in the coordinates. The positions were learned from relationships. Nearby points now carry useful information.';
+ $('codex').innerHTML='<b>Embedding:</b> a learned numerical position for an item. Here every word is represented by two coordinates.<br><br><b>Neighborhood:</b> distance in the learned space can encode useful similarity.<br><br><b>Representation:</b> the word itself did not change. The machine learned a form in which relationships became geometric.';
+ inspect('KING');window.scrollTo({top:$('inspector').offsetTop-12,behavior:'smooth'});
+};
+$('finalBtn').onclick=()=>{
+ $('badge').textContent='STAGE 3/3';let pass=0,html='';
+ for(const [a,b] of heldout){const d=dist(a,b);let cross=Infinity;for(const v of WORDS)if(group[v]!==group[a])cross=Math.min(cross,dist(a,v));const ok=d<cross;if(ok)pass++;html+=`<div class="pair ${ok?'ok':''}"><b>${a} ↔ ${b}</b><span>${ok?'closer than unrelated words':'relation not recovered'}</span></div>`}
+ $('pairResults').innerHTML=html;$('finalResult').innerHTML=`<div class="stamp">${pass===heldout.length?'SPACE PASSES':'KEEP TRAINING'}</div><p class="copy"><b>${pass} / ${heldout.length}</b> withheld relationships recovered.</p><p class="copy">${pass===heldout.length?'The machine inferred useful neighborhoods for relationships it was never directly shown. Meaning was not a label on the map. It emerged from structure.':'Train longer, then test the hidden relationships again.'}</p>`;
+};
+draw();
+})();
+</script>
+</body>
+</html>
