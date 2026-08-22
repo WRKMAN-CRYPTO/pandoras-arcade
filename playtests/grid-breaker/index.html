@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
-<meta name="playtest-build" content="codex/grid-breaker-fracture@1bf91f8" />
+<meta name="playtest-build" content="codex/grid-breaker-fracture@fb5640c" />
 <meta name="theme-color" content="#0b1020" />
 <title>GRID//BREAKER</title>
 <style>
@@ -188,7 +188,7 @@ function drawGrid(g,t){
  x.fillStyle=S.boss?'#ffe2a6':'#f3f9ff';x.font='900 '+(S.boss?'13':'14')+'px monospace';x.textAlign='center';for(let i=0;i<A.length;i++)if(xs[i+1]-xs[i]>=20)x.fillText(A[i],(xs[i]+xs[i+1])/2,gy-6);for(let i=0;i<B.length;i++)if(ys[i+1]-ys[i]>=15)x.fillText(B[i],gx-20,(ys[i]+ys[i+1])/2+4)
 }
 function draw(){
- x.clearRect(0,0,W,H);let now=performance.now()/1000,t=juiceFreeze>0?animT:now;if(juiceFreeze>0)juiceFreeze--;else animT=now;let cx=W*.5,cy=H*(S.boss?.61:.47),g=gridGeom();
+ x.clearRect(0,0,W,H);let now=performance.now()/1000,t=juiceFreeze>0?animT:now;if(juiceFreeze>0)juiceFreeze--;else animT=now;let cx=W*.5,g=gridGeom(),cy=S.boss?H*.61:Math.max(H*.47,g.gy+g.gh+90);
  if(S.shake>0)S.shake=Math.max(0,S.shake-1/30);let sx=S.shake?Math.round((Math.random()-.5)*10*S.shake):0,sy=S.shake?Math.round((Math.random()-.5)*10*S.shake):0;
  x.save();x.translate(sx,sy);
  S.ambientT+=1/60;if(S.ambientT>.12){S.ambientT=0;particles(18+Math.random()*(W-36),58+Math.random()*(H-140),1,{color:Math.random()<.65?'#73dcff':'#ffd36e',size:2,spread:24,life:1.1,gravity:-4})}
