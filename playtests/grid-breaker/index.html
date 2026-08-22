@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="robots" content="noindex,nofollow" />
-<meta name="playtest-build" content="codex/grid-breaker-fracture@9df4098" />
+<meta name="playtest-build" content="codex/grid-breaker-fracture@9a5b8d9" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
 <meta name="theme-color" content="#0b1020" />
 <title>GRID//BREAKER</title>
@@ -177,7 +177,7 @@ function draw(){
  S.ambientT+=1/60;if(S.ambientT>.12){S.ambientT=0;particles(18+Math.random()*(W-36),58+Math.random()*(H-140),1,{color:Math.random()<.65?'#73dcff':'#ffd36e',size:2,spread:24,life:1.1,gravity:-4})}
  // sparse ember motes and rune dust
  x.fillStyle='rgba(241,196,106,.08)';for(let yy=54;yy<H-40;yy+=32)for(let xx=18;xx<W;xx+=40)if(((xx+yy)/8|0)%3===0)x.fillRect(xx,yy,2,2);
- drawGrid(g,t);
+ if(S.parts.length)drawGrid(g,t);
  drawPixelEnemy(S.enemyKind,cx,cy,t);
  for(const b of S.beams){b.t-=1/60;drawPixelBeam(b)}S.beams=S.beams.filter(b=>b.t>0);
  if(S.enemyHit>0)S.enemyHit=Math.max(0,S.enemyHit-1/34);if(S.combineFlash>0)S.combineFlash=Math.max(0,S.combineFlash-1/30);
