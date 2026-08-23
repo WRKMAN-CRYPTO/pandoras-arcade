@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<!-- BUILD: ACCESSIBLE_CHAIN_SCORE_V2 -->
+<!-- BUILD: MOBILE_LAUNCH_PANEL_V3 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
 <meta name="theme-color" content="#0b1020" />
@@ -90,6 +90,34 @@ canvas{position:absolute;inset:0;width:100%;height:100%}
  #controls{grid-column:2;grid-row:3;padding:0 8px 6px 4px}.ctrl{min-height:58px;font-size:14px}
  #problem{font-size:27px;top:8px}#hint{font-size:16px;line-height:1.3;padding:8px;bottom:6px}#audioBtn{width:64px;height:40px;font-size:12px;top:7px;right:7px}#bossTag{top:44px;font-size:13px;padding:4px 8px}
 }
+/* MOBILE LAUNCH PANEL V3 — readable copy, permanently reachable start action */
+#start .card{display:flex;flex-direction:column;width:min(94vw,560px);height:min(760px,calc(100dvh - var(--top) - var(--bot) - 24px));max-height:calc(100dvh - var(--top) - var(--bot) - 24px);overflow:hidden;padding:0}
+#start .startScroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:18px 18px 12px;scrollbar-gutter:stable}
+#start .startScroll:after{content:"";display:block;height:2px}
+#start .startFooter{flex:none;padding:10px 18px 18px;border-top:1px solid #294a68;background:linear-gradient(180deg,#0b1525,#070c16);box-shadow:0 -10px 20px #030610aa}
+#start .startFooter .bigbtn{min-height:58px;margin:0}
+#start .startNote{margin-top:12px;padding:10px 11px;border:1px solid #294a68;background:#091321;color:#c9d8e9;font-size:16px;line-height:1.4}
+#start .startNote b{color:#ffcf5a}
+@media(max-width:430px){
+ #start{padding:calc(var(--top) + 8px) 8px calc(var(--bot) + 8px)}
+ #start .card{width:100%;height:calc(100dvh - var(--top) - var(--bot) - 16px);max-height:none}
+ #start .startScroll{padding:16px 16px 10px}
+ #start .startFooter{padding:9px 16px 15px}
+ #start .card h1{font-size:29px;margin-bottom:9px}
+ #start .legend{gap:7px;margin-top:10px}
+ #start .legend div{padding:10px;font-size:16px;line-height:1.32}
+}
+@media(orientation:landscape) and (max-height:600px){
+ #start .card{width:min(760px,96vw);height:calc(100dvh - 12px);max-height:none}
+ #start .startScroll{padding:12px 15px 8px}
+ #start .card h1{font-size:24px;margin-bottom:6px}
+ #start .small{font-size:16px;line-height:1.35}
+ #start .legend{grid-template-columns:repeat(4,1fr);margin-top:8px}
+ #start .legend div{padding:8px;font-size:14px;line-height:1.25}
+ #start .startNote{margin-top:8px;padding:7px 9px;font-size:14px}
+ #start .startFooter{padding:7px 15px 11px}
+ #start .startFooter .bigbtn{min-height:48px;padding:10px}
+}
 </style>
 </head>
 <body>
@@ -107,7 +135,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%}
  </div>
  <div id="controls"><button class="ctrl" id="split">CHOOSE FRACTURE</button><button class="ctrl primary" id="combine">COMBINE</button></div>
 </div>
-<div id="start"><div class="card"><h1>GRID//BREAKER</h1><div class="small">A multiplication dungeon where decomposition is the weapon. Fracture a factor, charge every partial product, then recompose the grid for the finishing strike.</div><div class="legend"><div><b>1 // READ</b><br>Size up the whole rectangle.</div><div><b>2 // FRACTURE</b><br>Break a factor by place value.</div><div><b>3 // CHARGE</b><br>Solve each exposed sector.</div><div><b>4 // STRIKE</b><br>Recompose the total and break the foe.</div></div><div class="small" style="margin-top:9px"><b>BOSS DEPTHS:</b> every fifth floor forces a full fracture and a two-wave assault. Music starts off; enable it only if you want it.</div><button class="bigbtn" id="boot">CLOCK IN // BREAK THE GRID</button></div></div>
+<div id="start"><div class="card"><div class="startScroll"><h1>GRID//BREAKER</h1><div class="small">Decompose a factor. Solve every partial product. Recompose the total. Break the foe.</div><div class="legend"><div><b>1 // READ</b><br>See the whole product.</div><div><b>2 // FRACTURE</b><br>Split one factor.</div><div><b>3 // CHARGE</b><br>Solve each part.</div><div><b>4 // STRIKE</b><br>Add and attack.</div></div><div class="startNote"><b>BOSS:</b> every fifth depth.<br><b>MUSIC:</b> starts off.</div></div><div class="startFooter"><button class="bigbtn" id="boot">CLOCK IN // BREAK THE GRID</button></div></div></div>
 <div class="modal" id="modal"><div class="card"><h2 id="mt"></h2><div class="small" id="ms"></div><div id="ml"></div><button class="bigbtn" id="close">RETURN</button></div></div>
 <script>
 (()=>{
